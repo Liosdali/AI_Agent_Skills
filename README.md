@@ -8,6 +8,15 @@ AI ajanlarıyla çalışan projelere kurulabilen kitler.
 
 ## Hızlı başlangıç
 
+Claude Code kullanıyorsan plugin olarak kur ve projende çalıştır:
+
+```text
+/plugin install project-architecture --marketplace Liosdali/AI_Agent_Skills
+/project-architecture:install
+```
+
+Diğer araçlarla kurulum betiğini kullan:
+
 ```sh
 git clone https://github.com/Liosdali/AI_Agent_Skills.git
 cd AI_Agent_Skills/project-architecture

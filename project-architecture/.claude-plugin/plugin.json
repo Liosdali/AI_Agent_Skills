@@ -1,0 +1,12 @@
+{
+  "name": "project-architecture",
+  "version": "1.0.0",
+  "description": "Dosya yapısı rehberini, AI ajan kurallarını ve otomatik mimari kontrolü bir projeye kurar",
+  "author": {
+    "name": "Mete Baykal"
+  },
+  "homepage": "https://github.com/Liosdali/AI_Agent_Skills/tree/main/project-architecture",
+  "repository": "https://github.com/Liosdali/AI_Agent_Skills",
+  "license": "MIT",
+  "keywords": ["architecture", "project-structure", "agents", "code-quality"]
+}
