@@ -12,10 +12,36 @@ Bu dosya projede çalışan tüm AI ajanları için bağlayıcıdır. Kuralları
 
 ## Temel kurallar
 
-- **Think Before Coding.** Don't assume, don't hide confusion, surface tradeoffs.
-- **Simplicity First.** Minimum code that solves the problem. Nothing speculative.
-- **Surgical Changes.** Touch only what you must. Clean up only your own mess.
-- **Goal-Driven Execution.** Define success criteria. Loop until verified.
+### 1. Think Before Coding
+
+- Don't assume. If something is unclear, stop and ask.
+- Don't hide confusion. Name what's confusing.
+- Surface tradeoffs before you make the call.
+- Restate the assumption back so we know we agree.
+
+### 2. Simplicity First
+
+- Minimum code that solves the problem.
+- No speculative features. No flexibility nobody asked for.
+- No abstractions for single-use code.
+- No error handling for impossible scenarios.
+- Test: would a senior engineer call this overcomplicated? If yes, simplify.
+
+### 3. Surgical Changes
+
+- Touch only what you must to satisfy the request.
+- Don't reformat, refactor, or "improve" adjacent code.
+- Match the existing style even if you would do it differently.
+- If you notice unrelated dead code, mention it. Do not delete it.
+- Test: every changed line should trace directly to the user's request.
+
+### 4. Goal-Driven Execution
+
+- Transform tasks into verifiable goals before you write any code.
+- "Add validation" becomes "write tests for invalid inputs, then make them pass."
+- "Fix the bug" becomes "write a test that reproduces it, then make it pass."
+- For multi-step tasks, write the plan first. Attach a check to each step.
+- Loop until the goal is verified. Do not declare done until it is.
 
 ## Kod yazmadan önce
 
