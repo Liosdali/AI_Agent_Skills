@@ -1,0 +1,13 @@
+name: Architecture
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  architecture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mimari kontrol
+        run: sh tools/check-architecture.sh

@@ -1,0 +1,10 @@
+# @KULLANICI_ADI yerine mimariden sorumlu GitHub kullanıcısını veya ekibini yaz.
+/AGENTS.md                            @KULLANICI_ADI
+/CLAUDE.md                            @KULLANICI_ADI
+/docs/ARCHITECTURE.md                 @KULLANICI_ADI
+/.claude/settings.json                @KULLANICI_ADI
+/.githooks/                           @KULLANICI_ADI
+/.github/CODEOWNERS                   @KULLANICI_ADI
+/.github/workflows/architecture.yml   @KULLANICI_ADI
+/tools/check-architecture.*           @KULLANICI_ADI
+/tools/architecture-baseline.txt      @KULLANICI_ADI

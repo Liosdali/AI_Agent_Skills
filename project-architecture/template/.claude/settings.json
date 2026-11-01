@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(AGENTS.md)",
+      "Edit(CLAUDE.md)",
+      "Edit(docs/ARCHITECTURE.md)",
+      "Edit(.claude/settings.json)",
+      "Edit(.githooks/**)",
+      "Edit(.github/CODEOWNERS)",
+      "Edit(.github/workflows/architecture.yml)",
+      "Edit(tools/check-architecture.*)",
+      "Edit(tools/architecture-baseline.txt)",
+      "Bash(*--update-baseline*)",
+      "Bash(*--no-verify*)",
+      "PowerShell(*--update-baseline*)",
+      "PowerShell(*--no-verify*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/tools/check-architecture.sh\" --hook",
+            "timeout": 60,
+            "statusMessage": "Mimari kontrol"
+          }
+        ]
+      }
+    ]
+  }
+}
