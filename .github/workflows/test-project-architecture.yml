@@ -1,0 +1,26 @@
+name: Test project-architecture
+
+on:
+  push:
+    paths:
+      - "project-architecture/**"
+      - ".github/workflows/test-project-architecture.yml"
+      - ".gitattributes"
+  pull_request:
+    paths:
+      - "project-architecture/**"
+      - ".github/workflows/test-project-architecture.yml"
+      - ".gitattributes"
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Testleri çalıştır
+        shell: bash
+        run: bash project-architecture/tests/test-kit.sh
