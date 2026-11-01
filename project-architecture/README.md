@@ -186,7 +186,7 @@ yapmadan önce bana sor. Var olan kodu taşıma ve değiştirme.
 ## Otomatik kontrolün sınırları
 
 - **Denetlenenler:** Klasör yerleşimi, bağımlılık yönü, satırların `Store` veya `Service` kullanımı, kabuğa statik erişim ve `Manager`, `Helper`, `Utils` dosya adları.
-- **Denetlenemeyenler:** İsimlerin ekranla eşleşmesi, ekrana yazılmış iş kuralları ve gereksiz soyutlamalar. Bunlar için `docs/ARCHITECTURE.md` Bölüm 17'deki PR listesi kullanılır.
+- **Denetlenemeyenler:** İsimlerin ekranla eşleşmesi, ekrana yazılmış iş kuralları, gereksiz soyutlamalar ve arayüzün tasarım dosyasına uyumu. Bunlar için `docs/ARCHITECTURE.md` Bölüm 17'deki PR listesi kullanılır.
 
 ## Kiti güncelleme
 

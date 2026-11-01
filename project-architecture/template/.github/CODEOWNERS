@@ -2,6 +2,7 @@
 /AGENTS.md                            @KULLANICI_ADI
 /CLAUDE.md                            @KULLANICI_ADI
 /docs/ARCHITECTURE.md                 @KULLANICI_ADI
+DESIGN.md                             @KULLANICI_ADI
 /.claude/settings.json                @KULLANICI_ADI
 /.githooks/                           @KULLANICI_ADI
 /.github/CODEOWNERS                   @KULLANICI_ADI
