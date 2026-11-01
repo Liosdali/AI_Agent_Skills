@@ -10,6 +10,13 @@ Bu dosya projede çalışan tüm AI ajanları için bağlayıcıdır. Kuralları
 - Mimari kontrol: `sh tools/check-architecture.sh`
 - Windows PowerShell'de mimari kontrol: `& "$env:ProgramFiles\Git\bin\sh.exe" tools/check-architecture.sh`
 
+## Temel kurallar
+
+- **Think Before Coding.** Don't assume, don't hide confusion, surface tradeoffs.
+- **Simplicity First.** Minimum code that solves the problem. Nothing speculative.
+- **Surgical Changes.** Touch only what you must. Clean up only your own mess.
+- **Goal-Driven Execution.** Define success criteria. Loop until verified.
+
 ## Kod yazmadan önce
 
 1. Değişikliğin yerini `docs/ARCHITECTURE.md` Bölüm 1'den belirle.
