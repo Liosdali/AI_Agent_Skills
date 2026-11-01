@@ -1,16 +1,16 @@
 #!/bin/sh
-# Mimari kuralları denetler. Yalnızca baseline dışındaki yeni ihlaller hata verir.
+# Checks the architecture rules. Only new violations outside the baseline fail.
 #
-#   sh tools/check-architecture.sh                    Denetler, ihlalde 1 ile çıkar
-#   sh tools/check-architecture.sh --hook             AI kancaları için, ihlalde 2 ile çıkar
-#   sh tools/check-architecture.sh --update-baseline  Mevcut ihlalleri kaydeder (yalnızca insan)
+#   sh tools/check-architecture.sh                    Checks, exits 1 on a violation
+#   sh tools/check-architecture.sh --hook             For AI hooks, exits 2 on a violation
+#   sh tools/check-architecture.sh --update-baseline  Records current violations (humans only)
 #
-# Desteklenen diller: Java, Kotlin, Dart, JavaScript, TypeScript, Python.
+# Supported languages: Java, Kotlin, Dart, JavaScript, TypeScript, Python.
 
-# --- Projeye göre ayarla ---------------------------------------------------
-SRC_ROOT="${ARCH_SRC_ROOT:-src}"         # Örnek: lib, src/main/java/com/acme/app
-IMPORT_PREFIX="${ARCH_IMPORT_PREFIX:-}"  # Örnek: com.acme.app, package:myapp, @
-EXTRA_DIRS="${ARCH_EXTRA_DIRS:-}"        # Dilin veya çatının zorunlu kıldığı klasörler. Örnek: l10n generated
+# --- Set for your project ---------------------------------------------------
+SRC_ROOT="${ARCH_SRC_ROOT:-src}"         # Example: lib, src/main/java/com/acme/app
+IMPORT_PREFIX="${ARCH_IMPORT_PREFIX:-}"  # Example: com.acme.app, package:myapp, @
+EXTRA_DIRS="${ARCH_EXTRA_DIRS:-}"        # Folders the language or framework requires. Example: l10n generated
 # ---------------------------------------------------------------------------
 
 LAYERS="app shell screens business jobs shared platform"
@@ -28,11 +28,11 @@ case "${1:-}" in
   "") ;;
   --hook) MODE="hook" ;;
   --update-baseline) MODE="update" ;;
-  *) echo "Bilinmeyen seçenek: $1" >&2; exit 1 ;;
+  *) echo "Unknown option: $1" >&2; exit 1 ;;
 esac
 
 if [ ! -d "$SRC_ROOT" ]; then
-  echo "Kaynak kökü bulunamadı: $SRC_ROOT. SRC_ROOT değerini ayarlayın." >&2
+  echo "Source root not found: $SRC_ROOT. Set SRC_ROOT." >&2
   exit 1
 fi
 
@@ -43,11 +43,11 @@ find_sources() {
 
 if [ -z "$IMPORT_PREFIX" ]; then
   if [ -n "$(find "$SRC_ROOT" -type f \( -name '*.java' -o -name '*.kt' \) | head -n 1)" ]; then
-    echo "Java ve Kotlin için IMPORT_PREFIX zorunludur. Örnek: com.acme.app" >&2
+    echo "IMPORT_PREFIX is required for Java and Kotlin. Example: com.acme.app" >&2
     exit 1
   fi
   if [ "$MODE" != "hook" ]; then
-    echo "Uyarı: IMPORT_PREFIX boş, yalnızca göreli import'lar denetleniyor." >&2
+    echo "Warning: IMPORT_PREFIX is empty, only relative imports are checked." >&2
   fi
 fi
 
@@ -61,13 +61,13 @@ for dir in "$SRC_ROOT"/*/; do
   name=$(basename "$dir")
   case " $LAYERS $EXTRA_DIRS " in
     *" $name "*) ;;
-    *) printf 'KLASOR|%s/%s|\n' "$SRC_ROOT" "$name" >> "$RAW" ;;
+    *) printf 'FOLDER|%s/%s|\n' "$SRC_ROOT" "$name" >> "$RAW" ;;
   esac
 done
 
 if ! find_sources -print0 | xargs -0 awk -v root="$SRC_ROOT" -v prefix="$IMPORT_PREFIX" \
   -v allowed="$LAYERS $EXTRA_DIRS" -f tools/check-architecture.awk >> "$RAW"; then
-  echo "Mimari kontrol çalıştırılamadı." >&2
+  echo "Could not run the architecture check." >&2
   exit 1
 fi
 
@@ -75,7 +75,7 @@ sort -u "$RAW" > "$CURRENT"
 
 if [ "$MODE" = "update" ]; then
   cp "$CURRENT" "$BASELINE"
-  echo "Baseline güncellendi: $(wc -l < "$CURRENT" | tr -d ' ') kayıt"
+  echo "Baseline updated: $(wc -l < "$CURRENT" | tr -d ' ') entries"
   exit 0
 fi
 
@@ -87,12 +87,12 @@ fi
 
 explain() {
   case "$1" in
-    KLASOR) echo "Yeni klasör ve dosya yalnızca şu klasörlerde olabilir: $LAYERS $EXTRA_DIRS" ;;
-    BAGIMLILIK) echo "Bağımlılık yönü: app -> shell, screens, jobs -> business -> platform" ;;
-    BOLUM_VERI) echo "Bölüm ve satırlar Store veya Service kullanmaz, veriyi XData üzerinden alır." ;;
-    STATIK_KABUK) echo "Kabuğa statik erişim yasak. Navigator, Feedback veya ortak veriyi constructor'dan alın." ;;
-    DOSYA_ADI) echo "Manager, Helper ve Util adları kullanılmaz. İşi anlatan bir ad seçin." ;;
-    *) echo "Bilinmeyen kural." ;;
+    FOLDER) echo "New folders and files can only be in these folders: $LAYERS $EXTRA_DIRS" ;;
+    DEPENDENCY) echo "Dependency direction: app -> shell, screens, jobs -> business -> platform" ;;
+    SECTION_DATA) echo "Sections and rows do not use Store or Service. They get data through XData." ;;
+    STATIC_SHELL) echo "Static access to the shell is not allowed. Get Navigator, Feedback or shared data through the constructor." ;;
+    FILE_NAME) echo "The names Manager, Helper and Util are not used. Choose a name that describes the job." ;;
+    *) echo "Unknown rule." ;;
   esac
 }
 
@@ -103,8 +103,8 @@ report_new() {
     echo "  $(explain "$rule")"
   done
   echo
-  echo "Yapı: docs/ARCHITECTURE.md"
-  echo "Kodu kurala uyacak şekilde düzeltin. Kontrolü veya baseline'ı değiştirerek geçmeyin."
+  echo "Structure: docs/ARCHITECTURE.md"
+  echo "Fix the code to follow the rule. Do not pass by changing the check or the baseline."
 }
 
 new_count=$(comm -13 "$KNOWN" "$CURRENT" | wc -l | tr -d ' ')
@@ -112,19 +112,19 @@ fixed_count=$(comm -23 "$KNOWN" "$CURRENT" | wc -l | tr -d ' ')
 
 if [ "$new_count" -gt 0 ]; then
   if [ "$MODE" = "hook" ]; then
-    { echo "Mimari kontrol: $new_count yeni ihlal"; echo; report_new; } >&2
+    { echo "Architecture check: $new_count new violation(s)"; echo; report_new; } >&2
     exit 2
   fi
-  echo "Mimari kontrol: $new_count yeni ihlal"
+  echo "Architecture check: $new_count new violation(s)"
   echo
   report_new
   exit 1
 fi
 
 if [ "$MODE" != "hook" ]; then
-  echo "Mimari kontrol geçti. Baseline: $(wc -l < "$KNOWN" | tr -d ' ') kayıt."
+  echo "Architecture check passed. Baseline: $(wc -l < "$KNOWN" | tr -d ' ') entries."
   if [ "$fixed_count" -gt 0 ]; then
-    echo "$fixed_count eski ihlal giderilmiş. Baseline'ı güncellemek için kod sahibine bildirin."
+    echo "$fixed_count old violation(s) fixed. Tell the code owner so the baseline can be updated."
   fi
 fi
 exit 0

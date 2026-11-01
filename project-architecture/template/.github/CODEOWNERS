@@ -1,11 +1,11 @@
-# @KULLANICI_ADI yerine mimariden sorumlu GitHub kullanıcısını veya ekibini yaz.
-/AGENTS.md                            @KULLANICI_ADI
-/CLAUDE.md                            @KULLANICI_ADI
-/docs/ARCHITECTURE.md                 @KULLANICI_ADI
-DESIGN.md                             @KULLANICI_ADI
-/.claude/settings.json                @KULLANICI_ADI
-/.githooks/                           @KULLANICI_ADI
-/.github/CODEOWNERS                   @KULLANICI_ADI
-/.github/workflows/architecture.yml   @KULLANICI_ADI
-/tools/check-architecture.*           @KULLANICI_ADI
-/tools/architecture-baseline.txt      @KULLANICI_ADI
+# Replace @YOUR_USERNAME with the GitHub user or team responsible for the architecture.
+/AGENTS.md                            @YOUR_USERNAME
+/CLAUDE.md                            @YOUR_USERNAME
+/docs/ARCHITECTURE.md                 @YOUR_USERNAME
+DESIGN.md                             @YOUR_USERNAME
+/.claude/settings.json                @YOUR_USERNAME
+/.githooks/                           @YOUR_USERNAME
+/.github/CODEOWNERS                   @YOUR_USERNAME
+/.github/workflows/architecture.yml   @YOUR_USERNAME
+/tools/check-architecture.*           @YOUR_USERNAME
+/tools/architecture-baseline.txt      @YOUR_USERNAME

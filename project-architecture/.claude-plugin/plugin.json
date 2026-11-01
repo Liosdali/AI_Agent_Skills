@@ -1,7 +1,7 @@
 {
   "name": "project-architecture",
-  "version": "1.0.1",
-  "description": "Dosya yapısı rehberini, AI ajan kurallarını ve otomatik mimari kontrolü bir projeye kurar",
+  "version": "2.0.0",
+  "description": "Installs a file structure guide, AI agent rules and automatic architecture checks into a project",
   "author": {
     "name": "Mete Baykal"
   },

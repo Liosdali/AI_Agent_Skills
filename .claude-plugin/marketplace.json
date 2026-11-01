@@ -1,6 +1,6 @@
 {
   "name": "ai-agent-skills",
-  "description": "AI ajanlarıyla çalışan projelere kurulabilen kitler",
+  "description": "Installable kits for projects that work with AI agents",
   "owner": {
     "name": "Mete Baykal"
   },
@@ -8,7 +8,7 @@
     {
       "name": "project-architecture",
       "source": "./project-architecture",
-      "description": "Dosya yapısı rehberini, AI ajan kurallarını ve otomatik mimari kontrolü bir projeye kurar"
+      "description": "Installs a file structure guide, AI agent rules and automatic architecture checks into a project"
     }
   ]
 }

@@ -1,5 +1,5 @@
-# Kaynak dosyaları satır satır okur, ihlalleri KURAL|dosya|metin biçiminde yazar.
-# root: kaynak kökü, prefix: proje içi import öneki, allowed: izinli üst klasörler.
+# Reads source files line by line and prints violations as RULE|file|text.
+# root: source root, prefix: project import prefix, allowed: allowed top-level folders.
 
 BEGIN {
   count = split("app shell screens business jobs shared platform", names, " ")
@@ -25,11 +25,11 @@ FNR == 1 {
 
   sourceLayer = relative
   sub(/\/.*$/, "", sourceLayer)
-  if (relative ~ /\// && !(sourceLayer in isAllowed)) report("KLASOR", "")
+  if (relative ~ /\// && !(sourceLayer in isAllowed)) report("FOLDER", "")
 
   fileName = tolower(file)
   sub(/^.*\//, "", fileName)
-  if (fileName ~ /(manager|helper|utils?)\.[a-z]+$/) report("DOSYA_ADI", "")
+  if (fileName ~ /(manager|helper|utils?)\.[a-z]+$/) report("FILE_NAME", "")
 }
 
 {
@@ -38,7 +38,7 @@ FNR == 1 {
   if (FNR == 1) sub(/^\357\273\277/, "", line)  # UTF-8 BOM
 
   if (line ~ /(AppFrame|AppLayout|AppShell|HomeShell)\.(getInstance|instance)/) {
-    report("STATIK_KABUK", line)
+    report("STATIC_SHELL", line)
   }
 
   target = importTarget(line)
@@ -51,9 +51,9 @@ FNR == 1 {
   sub(/\/.*$/, "", targetLayer)
   if (!(targetLayer in isLayer)) next
 
-  if (isForbidden(sourceLayer, targetLayer, path)) report("BAGIMLILIK", line)
+  if (isForbidden(sourceLayer, targetLayer, path)) report("DEPENDENCY", line)
   if (targetLayer == "business" && relative ~ /\/sections\// && isDataAccess(path)) {
-    report("BOLUM_VERI", line)
+    report("SECTION_DATA", line)
   }
 }
 
@@ -71,7 +71,7 @@ function isDataAccess(fullPath,    name) {
   return name ~ /(store|service)$/
 }
 
-# Import satırındaki hedefi döndürür. Import satırı değilse boş döner.
+# Returns the target of an import line, or empty if it is not an import line.
 function importTarget(text,    value) {
   if (extension ~ /^(java|kt|py)$/) {
     if (text !~ /^[ \t]*(import|from)[ \t]/) return ""
@@ -90,7 +90,7 @@ function importTarget(text,    value) {
   return ""
 }
 
-# Hedefi kaynak köküne göre yola çevirir. Proje dışıysa boş döner.
+# Turns the target into a path relative to the source root, or empty if outside the project.
 function resolveImport(value,    dots, rest, i, path) {
   if (extension == "py" && substr(value, 1, 1) == ".") {
     match(value, /^\.+/)

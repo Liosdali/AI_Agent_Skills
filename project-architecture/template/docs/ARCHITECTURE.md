@@ -1,220 +1,220 @@
-# Proje Mimarisi
+# Project Architecture
 
-Bu yapının iki amacı var:
+This structure has two goals:
 
-1. Projeye yeni gelen biri, ekranda gördüğü bir satırın kodunu klasör hiyerarşisini izleyerek bulabilsin.
-2. Bağımlılıklar tepeden aşağı tek yönde izlenebilsin.
+1. Someone new to the project can find the code behind a line on a screen by following the folder hierarchy.
+2. Dependencies can be traced top-down in one direction.
 
-Amaç çok katman açmak değil. Katman, klasör veya sınıf ancak okumayı kolaylaştırıyorsa eklenir.
+The goal is not to create many layers. A layer, folder or class is added only if it makes the code easier to read.
 
-AI ajanları için bağlayıcı kurallar `AGENTS.md` içindedir. Kuralların bir bölümü `tools/check-architecture.sh` ile otomatik denetlenir.
+The binding rules for AI agents are in `AGENTS.md`. Some of the rules are checked automatically by `tools/check-architecture.sh`.
 
-## 1. Kod nereye yazılır
+## 1. Where code goes
 
-| Yazılacak kod | Yer |
+| Code | Location |
 |---|---|
-| Uygulama başlatma, nesne kurulumu | `app/` |
-| Ekran listesi ve rota eşleşmesi | `app/Routes` |
-| Pencere, ortak bölgeler, ekran değiştirme | `shell/` |
-| Ekran iskeleti | `screens/<menü-bölümü>/<ekran>/XScreen` |
-| Ekranda görünen veriler | `XData` |
-| Tıklama ve girdi işlemleri | `XActions` |
-| Ekran bölümleri ve satırlar | `<ekran>/sections/` |
-| Sekmeler ve açılır pencereler | `<ekran>/tabs/`, `<ekran>/dialogs/` |
-| Birkaç ekrandaki iş parçası | `screens/common/` |
-| Hesap, kural, iş akışı | `business/<konu>/` |
-| Veri okuma ve yazma | `business/<konu>/XStore` |
-| Ekranlar arası ortak iş durumu | `business/session/` |
-| Ekransız arka plan işi | `jobs/` |
-| İş bilgisi içermeyen bileşen | `shared/ui/` |
-| Para, tarih, sayı biçimi | `shared/format/` |
-| Veritabanı, HTTP, oturum, log, ayar | `platform/` |
-| Ekran metni | `resources/text/` |
-| Test | `tests/` altında aynı yol |
+| App startup, object setup | `app/` |
+| Screen list and route mapping | `app/Routes` |
+| Window, shared regions, switching screens | `shell/` |
+| Screen skeleton | `screens/<menu-section>/<screen>/XScreen` |
+| Data shown on the screen | `XData` |
+| Clicks and input handling | `XActions` |
+| Screen sections and rows | `<screen>/sections/` |
+| Tabs and popups | `<screen>/tabs/`, `<screen>/dialogs/` |
+| Business pieces used on several screens | `screens/common/` |
+| Calculations, rules, workflows | `business/<topic>/` |
+| Reading and writing data | `business/<topic>/XStore` |
+| Business state shared across screens | `business/session/` |
+| Background work with no screen | `jobs/` |
+| Components with no business knowledge | `shared/ui/` |
+| Money, date and number formats | `shared/format/` |
+| Database, HTTP, auth, logging, settings | `platform/` |
+| Screen text | `resources/text/` |
+| Tests | Same path under `tests/` |
 
-## 2. Dosya yapısı
+## 2. File structure
 
-Sipariş ekranları yalnızca örnektir. Yazım biçimi (`order-detail`, `orderdetail`) kullanılan dilin standardına uyar.
+The order screens are only an example. Spelling (`order-detail`, `orderdetail`) follows the standard of the language in use.
 
 ```text
-proje/
-├─ AGENTS.md                      # AI ajanları için kurallar
+project/
+├─ AGENTS.md                      # Rules for AI agents
 ├─ docs/
-│  └─ ARCHITECTURE.md             # Bu dosya
-├─ tools/                         # Mimari kontrol
+│  └─ ARCHITECTURE.md             # This file
+├─ tools/                         # Architecture check
 ├─ src/
 │  ├─ app/
-│  │  ├─ Main                     # Giriş noktası
-│  │  ├─ Wiring                   # Nesnelerin kurulduğu tek yer
-│  │  └─ Routes                   # Tüm ekranların listesi
+│  │  ├─ Main                     # Entry point
+│  │  ├─ Wiring                   # The one place objects are set up
+│  │  └─ Routes                   # List of all screens
 │  │
-│  ├─ shell/                      # Bütün ekranları saran kabuk
-│  │  ├─ AppFrame                 # Pencere ve bölgelerin yerleşimi
-│  │  ├─ ScreenHost               # Orta alan, aktif ekranı değiştirir
-│  │  ├─ ShellState               # Sidebar açık mı, aktif sekme ne
+│  ├─ shell/                      # The shell around all screens
+│  │  ├─ AppFrame                 # Window and region layout
+│  │  ├─ ScreenHost               # Center area, switches the active screen
+│  │  ├─ ShellState               # Is the sidebar open, which tab is active
 │  │  ├─ input/
-│  │  │  └─ GlobalShortcuts       # Uygulama geneli kısayollar
-│  │  └─ regions/                 # Her ekranda görünen bölgeler
+│  │  │  └─ GlobalShortcuts       # App-wide shortcuts
+│  │  └─ regions/                 # Regions visible on every screen
 │  │     ├─ header/
 │  │     │  ├─ HeaderRegion
 │  │     │  └─ HeaderData
 │  │     ├─ sidebar/
 │  │     └─ status-bar/
 │  │
-│  ├─ screens/                    # Kullanıcının gördüğü ekranlar
-│  │  ├─ orders/                  # Menü bölümü
-│  │  │  ├─ order-list/           # Ekran: Siparişler
-│  │  │  └─ order-detail/         # Ekran: Sipariş Detayı
-│  │  │     ├─ OrderDetailScreen  # İskelet: hangi bölüm nerede
-│  │  │     ├─ OrderDetailData    # Ekranda görünen tüm veriler
-│  │  │     ├─ OrderDetailActions # Tıklama ve girdi işlemleri
+│  ├─ screens/                    # The screens the user sees
+│  │  ├─ orders/                  # Menu section
+│  │  │  ├─ order-list/           # Screen: Orders
+│  │  │  └─ order-detail/         # Screen: Order Detail
+│  │  │     ├─ OrderDetailScreen  # Skeleton: which section goes where
+│  │  │     ├─ OrderDetailData    # All data shown on the screen
+│  │  │     ├─ OrderDetailActions # Clicks and input handling
 │  │  │     ├─ sections/
-│  │  │     │  ├─ summary/        # Bölüm: Özet
+│  │  │     │  ├─ summary/        # Section: Summary
 │  │  │     │  │  ├─ SummarySection
-│  │  │     │  │  ├─ TotalAmountRow   # Satır: Toplam Tutar
-│  │  │     │  │  └─ DeliveryDateRow  # Satır: Teslim Tarihi
-│  │  │     │  └─ items/          # Bölüm: Ürünler
-│  │  │     ├─ tabs/              # Ekranda sekme varsa
-│  │  │     └─ dialogs/           # Bu ekrandan açılan pencereler
+│  │  │     │  │  ├─ TotalAmountRow   # Row: Total Amount
+│  │  │     │  │  └─ DeliveryDateRow  # Row: Delivery Date
+│  │  │     │  └─ items/          # Section: Items
+│  │  │     ├─ tabs/              # If the screen has tabs
+│  │  │     └─ dialogs/           # Popups opened from this screen
 │  │  ├─ editor/
-│  │  │  └─ drawing/              # Karmaşık ekran örneği
+│  │  │  └─ drawing/              # Example of a complex screen
 │  │  │     ├─ DrawingScreen
 │  │  │     ├─ DrawingData
 │  │  │     └─ sections/canvas/
 │  │  │        ├─ CanvasSection
-│  │  │        ├─ input/          # Fare ve klavye
-│  │  │        └─ render/         # Çizim
-│  │  └─ common/                  # Birkaç ekrandaki iş parçaları
+│  │  │        ├─ input/          # Mouse and keyboard
+│  │  │        └─ render/         # Drawing
+│  │  └─ common/                  # Business pieces used on several screens
 │  │
-│  ├─ business/                   # İş konuları, ekranları bilmez
+│  ├─ business/                   # Business topics, does not know screens
 │  │  ├─ orders/
 │  │  │  ├─ Order                 # Model
-│  │  │  ├─ OrderTotal            # Hesap kuralı
-│  │  │  ├─ OrderService          # İşlemler: oluştur, iptal et
-│  │  │  └─ OrderStore            # Okuma ve yazma
+│  │  │  ├─ OrderTotal            # Calculation rule
+│  │  │  ├─ OrderService          # Operations: create, cancel
+│  │  │  └─ OrderStore            # Reading and writing
 │  │  ├─ customers/
-│  │  └─ session/                 # Ekranlar arası ortak iş durumu
+│  │  └─ session/                 # Business state shared across screens
 │  │     ├─ CurrentUser
 │  │     └─ ActiveCustomer
 │  │
-│  ├─ jobs/                       # Ekransız işler: zamanlayıcı, senkronizasyon
-│  ├─ shared/                     # İş bilgisi içermeyen ortak parçalar
-│  │  ├─ ui/                      # Düğme, tablo, tema
-│  │  ├─ format/                  # Para, tarih, sayı biçimi
+│  ├─ jobs/                       # Work with no screen: timers, sync
+│  ├─ shared/                     # Shared pieces with no business knowledge
+│  │  ├─ ui/                      # Button, table, theme
+│  │  ├─ format/                  # Money, date and number formats
 │  │  ├─ navigation/
-│  │  │  ├─ Route                 # Ekranların kimlikleri
-│  │  │  └─ Navigator             # Ekran açma arayüzü
+│  │  │  ├─ Route                 # Screen identifiers
+│  │  │  └─ Navigator             # Interface for opening screens
 │  │  └─ feedback/
-│  │     └─ Feedback              # Kullanıcıya mesaj gösterme arayüzü
-│  └─ platform/                   # Dış dünya
+│  │     └─ Feedback              # Interface for showing messages to the user
+│  └─ platform/                   # The outside world
 │     ├─ database/
 │     ├─ http/
 │     ├─ auth/
 │     ├─ logging/
 │     └─ config/
 ├─ resources/
-│  └─ text/                       # Ekran metinleri
-└─ tests/                         # src ile aynı hiyerarşi
+│  └─ text/                       # Screen text
+└─ tests/                         # Same hierarchy as src
 ```
 
-Dilin veya çatının zorunlu kıldığı dosyalar (ör. kökteki giriş dosyası) yerinde kalır ve doğrudan `app/` içine geçer.
+Files the language or framework requires (for example an entry file at the root) stay where they are and pass straight to `app/`.
 
-## 3. Bağımlılık yönü
+## 3. Dependency direction
 
 ```text
 app → shell, screens, jobs → business → platform
 ```
 
-- `app/` her şeyi bilir ve parçaları birbirine bağlar.
-- `shell/` ile `screens/` birbirini tanımaz. İkisi de `shared/navigation` ve `shared/feedback` arayüzlerini kullanır.
-- `business/` ekranları, `platform/` iş konularını bilmez.
-- `shared/` her yerden kullanılabilir, ama iş konularını bilmez.
-- `shell/`, `screens/` ve `jobs/` katmanları `platform/` içinden yalnızca `logging` ve `config` kullanır.
-- Bir iş konusu başka bir konunun iç dosyasına değil, dışa açtığı sınıfa bağlanır. İki konu birbirine muhtaçsa ortak parça ayrılır.
+- `app/` knows everything and connects the pieces.
+- `shell/` and `screens/` do not know each other. Both use the `shared/navigation` and `shared/feedback` interfaces.
+- `business/` does not know screens, and `platform/` does not know business topics.
+- `shared/` can be used from anywhere, but it does not know business topics.
+- The `shell/`, `screens/` and `jobs/` layers use only `logging` and `config` from `platform/`.
+- A business topic depends on the class another topic exposes, not on its internal files. If two topics need each other, the shared part is split out.
 
-Bağımlılıklar constructor'dan verilir ve `app/Wiring` içinde kurulur. Böylece bir sınıfın neye bağlı olduğu ilk bakışta görülür.
+Dependencies are passed through the constructor and set up in `app/Wiring`. That way, what a class depends on is visible at first glance.
 
-## 4. Zorunlu kurallar
+## 4. Required rules
 
-1. **İsimler ekranı takip eder:** Klasör ve dosyalar görünen ekran, bölüm ve satırla eşleşir. Aynı veri her katmanda aynı adı taşır (`totalAmount`).
-2. **Her ekranın tek veri kapısı vardır:** Bölüm ve satırlar veri çekmez, `XData` üzerinden alır.
-3. **İş kuralı ekranda yazılmaz:** Hesap ve kararlar `business/` içinde durur.
-4. **Bağımlılık aşağı iner:** Bölüm 3'teki yön dışına çıkılmaz, döngü oluşturulmaz.
-5. **Gizli erişim yoktur:** `AppFrame.getInstance()` gibi statik erişim ve genel event bus kullanılmaz.
-6. **Tasarım dosyasının dışına çıkılmaz:** Projede tasarımı tanımlayan bir md dosyası varsa (ör. `DESIGN.md`), arayüz bu dosyaya uyar. Dosyada olmayan bir şey gerekiyorsa önce dosya insan kararıyla güncellenir.
+1. **Names follow the screen:** Folders and files match the visible screen, section and row. The same data has the same name in every layer (`totalAmount`).
+2. **Each screen has one data gate:** Sections and rows do not fetch data. They get it through `XData`.
+3. **Business rules are not written in screens:** Calculations and decisions stay in `business/`.
+4. **Dependencies go down:** The direction in Section 3 is not broken, and no cycles are created.
+5. **No hidden access:** Static access such as `AppFrame.getInstance()` and a general event bus are not used.
+6. **The design file is not left:** If the project has an md file that defines the design (for example `DESIGN.md`), the interface follows that file. If something that is not in the file is needed, a person updates the file first.
 
-## 5. Ekrandaki veriyi bulma
+## 5. Finding the data on a screen
 
-Örnek soru: "Sipariş Detayı ekranındaki Toplam Tutar neden yanlış?"
+Example question: "Why is the Total Amount on the Order Detail screen wrong?"
 
-| Adım | Soru | Konum | Orada görülen |
+| Step | Question | Location | What you see there |
 |---|---|---|---|
-| 1 | Hangi ekran? | `screens/orders/order-detail/` | Ekran adı, gerekirse `app/Routes` |
-| 2 | Hangi bölüm? | `sections/summary/` | Özet bölümü |
-| 3 | Hangi satır? | `TotalAmountRow` | `data.totalAmount` gösterilir |
-| 4 | Değer nereden geliyor? | `OrderDetailData` | `totalAmount = OrderTotal.of(order)` |
-| 5 | Nasıl hesaplanıyor? | `business/orders/OrderTotal` | Hesap kuralı |
-| 6 | Ham veri nereden geliyor? | `business/orders/OrderStore` | Sorgu |
+| 1 | Which screen? | `screens/orders/order-detail/` | Screen name, `app/Routes` if needed |
+| 2 | Which section? | `sections/summary/` | Summary section |
+| 3 | Which row? | `TotalAmountRow` | Shows `data.totalAmount` |
+| 4 | Where does the value come from? | `OrderDetailData` | `totalAmount = OrderTotal.of(order)` |
+| 5 | How is it calculated? | `business/orders/OrderTotal` | Calculation rule |
+| 6 | Where does the raw data come from? | `business/orders/OrderStore` | Query |
 
-Kestirme yol metin dosyasıdır. Ekrandaki yazı aratılır, anahtar konumu söyler:
+The text file is a shortcut. Search for the text on the screen and the key tells you the location:
 
 ```text
-orderDetail.summary.totalAmount = "Toplam Tutar"
-   ekran      bölüm     satır
+orderDetail.summary.totalAmount = "Total Amount"
+  screen    section     row
 
-shell.header.userName = "Kullanıcı"
-kabuk bölge  satır
+shell.header.userName = "User"
+shell region   row
 ```
 
-Soruna göre bakılacak yer:
+Where to look, by problem:
 
-| Sorun | Konum |
+| Problem | Location |
 |---|---|
-| Görünüm veya yerleşim yanlış | `screens/.../sections/` |
-| Ekrana yanlış değer geliyor | `XData` |
-| Hesap veya iş kuralı yanlış | `business/<konu>/` |
-| Kayıt gelmiyor veya yazılmıyor | `business/<konu>/XStore` |
-| Tıklayınca yanlış iş yapılıyor | `XActions` |
-| Üst bar, menü veya durum çubuğu yanlış | `shell/regions/` |
-| Yazı yanlış | `resources/text/` |
-| Para veya tarih biçimi yanlış | `shared/format/` |
-| Bağlantı veya oturum hatası | `platform/` |
+| Appearance or layout is wrong | `screens/.../sections/` |
+| The screen gets the wrong value | `XData` |
+| A calculation or business rule is wrong | `business/<topic>/` |
+| A record does not arrive or is not written | `business/<topic>/XStore` |
+| A click does the wrong thing | `XActions` |
+| The top bar, menu or status bar is wrong | `shell/regions/` |
+| Text is wrong | `resources/text/` |
+| A money or date format is wrong | `shared/format/` |
+| Connection or auth error | `platform/` |
 
-## 6. Dosya adları
+## 6. File names
 
-| Ek | Görevi |
+| Suffix | Purpose |
 |---|---|
-| `XScreen` | Ekran iskeleti |
-| `XData` | Ekrana veya bölgeye verilen veriler |
-| `XActions` | Kullanıcı eylemleri |
-| `XSection` | Ekran bölümü |
-| `XRow` | Tek satır |
-| `XRegion` | Kabuktaki ortak bölge |
-| `XDialog` | Açılır pencere |
-| `XService` | İş işlemleri |
-| `XStore` | Veri okuma ve yazma |
-| `XTool` | Fare modu gibi değişebilir davranış |
+| `XScreen` | Screen skeleton |
+| `XData` | Data given to a screen or region |
+| `XActions` | User actions |
+| `XSection` | Screen section |
+| `XRow` | A single row |
+| `XRegion` | Shared region in the shell |
+| `XDialog` | Popup |
+| `XService` | Business operations |
+| `XStore` | Reading and writing data |
+| `XTool` | Changeable behavior such as a mouse mode |
 
-`Manager`, `Helper` ve `Utils` adları kullanılmaz. İşi tek cümleyle anlatan bir ad seçilir.
+The names `Manager`, `Helper` and `Utils` are not used. Pick a name that describes the job in one sentence.
 
-## 7. Ortak alanlar
+## 7. Shared areas
 
-| Ortak alan | Örnek | Yer |
+| Shared area | Example | Location |
 |---|---|---|
-| Her ekranda görünen bölge | Üst bar, sidebar, durum çubuğu | `shell/regions/` |
-| Birkaç ekrandaki iş parçası | Müşteri kartı | `screens/common/` |
-| İş bilgisi içermeyen bileşen | Düğme, tablo | `shared/ui/` |
-| Ekranlar arası iş durumu | Aktif kullanıcı, seçili müşteri | `business/session/` |
-| Kabuğun görünüm durumu | Sidebar açık mı | `shell/ShellState` |
-| Tek ekrana ait durum | Filtre, sıralama | `XData` |
-| Ortam ayarı | Sunucu adresi | `platform/config/` |
-| Tema | Renk, yazı tipi | `shared/ui/theme/` |
+| Region visible on every screen | Top bar, sidebar, status bar | `shell/regions/` |
+| Business piece used on several screens | Customer card | `screens/common/` |
+| Component with no business knowledge | Button, table | `shared/ui/` |
+| Business state across screens | Active user, selected customer | `business/session/` |
+| Shell view state | Is the sidebar open | `shell/ShellState` |
+| State of a single screen | Filter, sort order | `XData` |
+| Environment setting | Server address | `platform/config/` |
+| Theme | Color, font | `shared/ui/theme/` |
 
-`business/session/` içinde her konu ayrı küçük sınıf olur. Birçok alanı olan tek bir `AppState` sınıfı açılmaz. Bir ekran dışında kimse kullanmıyorsa veri ekranda kalır.
+Each topic in `business/session/` is its own small class. Do not create a single `AppState` class with many fields. Data used by only one screen stays in that screen.
 
-## 8. Kabuk ve AppFrame
+## 8. The shell and AppFrame
 
-`AppFrame` yalnızca pencereyi kurar ve bölgeleri yerleştirir. İçinde iş kuralı, ekran adı ve `getInstance()` bulunmaz. Web'de `AppLayout`, mobilde `HomeShell` aynı role karşılık gelir.
+`AppFrame` only sets up the window and places the regions. It contains no business rules, no screen names and no `getInstance()`. `AppLayout` on the web and `HomeShell` on mobile play the same role.
 
 ```java
 public final class AppFrame extends JFrame {
@@ -228,130 +228,130 @@ public final class AppFrame extends JFrame {
 }
 ```
 
-Paneller birbirini doğrudan çağırmaz:
+Panels do not call each other directly:
 
-| İhtiyaç | Kullanılacak yol |
+| Need | How |
 |---|---|
-| Başka ekrana geçmek | `navigator.open(Route.ORDER_DETAIL)` |
-| Ortak veri değişince diğer yerleri güncellemek | `business/session/` sınıfını dinlemek |
-| Mesaj göstermek | `feedback.show(...)` |
+| Go to another screen | `navigator.open(Route.ORDER_DETAIL)` |
+| Update other places when shared data changes | Listen to the `business/session/` class |
+| Show a message | `feedback.show(...)` |
 
 ```java
-// Yanlış: sınıf AppFrame'e ve tüm panellere bağlı
+// Wrong: the class depends on AppFrame and every panel
 AppFrame.getInstance().getHeader().setCustomer(customer);
 AppFrame.getInstance().getOrdersPanel().reload();
 
-// Doğru: sınıf yalnızca ihtiyacını bilir
-activeCustomer.set(customer);       // Header ve sipariş ekranı bunu dinler
-feedback.show("Müşteri seçildi");   // Durum çubuğu gösterir
+// Right: the class knows only what it needs
+activeCustomer.set(customer);        // The header and order screen listen to this
+feedback.show("Customer selected");  // The status bar shows it
 ```
 
-Genel event bus kullanılmaz, çünkü olayın nereden çıkıp nereye gittiği izlenemez. `ActiveCustomer` gibi adı belli sınıflarda dinleyiciler "Find Usages" ile bulunur.
+A general event bus is not used, because you cannot trace where an event comes from or where it goes. With named classes such as `ActiveCustomer`, "Find Usages" finds the listeners.
 
-## 9. Birden fazla giriş noktası
+## 9. Multiple entry points
 
-- Her gerçek giriş noktası `app/` içinde ayrı dosyadır (`EditorMain`, `ViewerMain`).
-- Giriş noktası yalnızca nesneleri kurar ve uygulamayı açar.
-- Deneme amaçlı giriş noktaları `tests/manual/` altına taşınır, kullanılmayanlar silinir.
-- Ayrı derleme modülüne yalnızca uygulamalar farklı bağımlılıklarla ayrı ürün olarak dağıtılıyorsa geçilir.
+- Each real entry point is a separate file in `app/` (`EditorMain`, `ViewerMain`).
+- An entry point only sets up objects and opens the app.
+- Trial entry points move to `tests/manual/`, and unused ones are deleted.
+- Move to a separate build module only if the apps ship as separate products with different dependencies.
 
-## 10. Karmaşık ekranlar
+## 10. Complex screens
 
-Fare, klavye ve çizim gibi teknik katmanlar üst seviyede durmaz, ait oldukları bölümün içine iner.
+Technical layers such as mouse, keyboard and drawing do not sit at the top level. They go inside the section they belong to.
 
 ```text
-Fare → input/CanvasMouseHandler → aktif Tool → state veya model değişir
-     → yenileme istenir → render/CanvasRenderer çizer
+Mouse → input/CanvasMouseHandler → active Tool → state or model changes
+      → refresh requested → render/CanvasRenderer draws
 ```
 
-- Fare kodu çizim yapmaz, çizim kodu veri değiştirmez.
-- `Tool` arayüzü en az iki fare modu varsa açılır.
-- Uzun çizim kodu `render/`, uzun girdi kodu `input/` altına alınır.
+- Mouse code does not draw, and drawing code does not change data.
+- The `Tool` interface is created only when there are at least two mouse modes.
+- Long drawing code moves to `render/`, and long input code moves to `input/`.
 
-## 11. Soyutlama ne zaman eklenir
+## 11. When to add an abstraction
 
-| Eklenecek şey | Koşul |
+| What to add | Condition |
 |---|---|
-| Servis | Gerçek bir kural veya birden fazla veri kaynağı varsa |
-| Interface | İki gerçek uygulama varsa ya da dış sistem testte sahtesiyle değiştirilecekse |
-| `shared/` | Kod üçüncü kez kullanıldığında ve iş bilgisi içermiyorsa |
-| DTO veya mapper | Veri şekilleri gerçekten farklıysa |
-| `domain/` alt klasörü | Yalnızca kuralları çok ağır olan iş konusunda |
+| Service | There is a real rule or more than one data source |
+| Interface | There are two real implementations, or an external system is replaced by a fake in tests |
+| `shared/` | The code is used a third time and has no business knowledge |
+| DTO or mapper | The data shapes really differ |
+| `domain/` subfolder | Only in a business topic with very heavy rules |
 
-Hesaplama ve karar kodu mümkün olduğunca saf fonksiyon olarak yazılır, böylece veritabanı veya ağ olmadan test edilir.
+Calculation and decision code is written as pure functions where possible, so it can be tested without a database or network.
 
-## 12. Dosya sayısını sınırlama
+## 12. Limiting the number of files
 
-- Satırın kendi mantığı veya özel görünümü yoksa ayrı dosya açılmaz, bölüm dosyasında durur.
-- Küçük ekranda `Screen`, `Data` ve `Actions` tek dosyada kalabilir.
-- `sections/`, `tabs/` ve `dialogs/` yalnızca ekranda karşılığı varsa açılır.
-- Alt klasör, bir klasördeki dosya sayısı 7-8'i geçince düşünülür.
-- 400 satırı geçen dosya ve 40 satırı geçen fonksiyon gözden geçirilir. Bunlar sinyaldir, kesin sınır değildir.
+- A row with no logic or custom appearance of its own does not get a separate file. It stays in the section file.
+- On a small screen, `Screen`, `Data` and `Actions` can stay in one file.
+- `sections/`, `tabs/` and `dialogs/` are created only if the screen has them.
+- Consider a subfolder when a folder passes 7-8 files.
+- Review files over 400 lines and functions over 40 lines. These are signals, not hard limits.
 
-## 13. Gereksiz kodu tespit etme
+## 13. Finding unnecessary code
 
-| Belirti | Kontrol | Yapılacak |
+| Sign | Check | Action |
 |---|---|---|
-| Aracı sınıf | Metotları yalnızca başka bir sınıfa mı yönlendiriyor? | Çağıranla birleştir, sınıfı sil |
-| Tek uygulamalı interface | Testte de sahtesi yok mu? | Interface'i sil |
-| Kullanılmayan kod | Araç ve arama referans bulamıyor mu? Reflection, DI ve rota kullanımını da kontrol et. | Sil |
-| Tek yerden çağrılan helper | Tek bir kullanıcısı mı var? | Kullanıldığı yere taşı |
-| Belirsiz sınıf | İşini tek cümleyle anlatamıyor musun? | Sorumluluklarına göre böl |
-| Tekrarlanan kod | Aynı kural mı, yoksa benzerlik tesadüf mü? | Aynı kuralsa birleştir, değilse bırak |
-| Kullanılmayan esneklik | Parametre veya flag hep aynı değeri mi alıyor? | Kaldır |
+| Pass-through class | Do its methods only forward to another class? | Merge it into the caller and delete the class |
+| Interface with one implementation | Does it also have no fake in tests? | Delete the interface |
+| Unused code | Do tools and search find no references? Also check reflection, DI and route usage. | Delete it |
+| Helper called from one place | Does it have only one user? | Move it next to that user |
+| Vague class | Can you not describe its job in one sentence? | Split it by responsibility |
+| Duplicate code | Is it the same rule, or a coincidence? | Merge if it is the same rule, otherwise leave it |
+| Unused flexibility | Does a parameter or flag always get the same value? | Remove it |
 
-## 14. Farklı proje türleri
+## 14. Other project types
 
-| Proje türü | `screens/` karşılığı | Alt parçalar |
+| Project type | `screens/` equivalent | Sub-parts |
 |---|---|---|
-| Web, mobil | Sayfa veya ekran | Bölüm, satır |
-| Masaüstü | Pencere | Panel, satır, canvas |
-| Backend API | `endpoints/` | Endpoint, yanıt alanı |
-| Komut satırı aracı | `commands/` | Komut, çıktı alanı |
+| Web, mobile | Page or screen | Section, row |
+| Desktop | Window | Panel, row, canvas |
+| Backend API | `endpoints/` | Endpoint, response field |
+| Command-line tool | `commands/` | Command, output field |
 
-`business/` ve `platform/` bu türlerin hepsinde aynı kalır. `screens/` yerine başka bir ad kullanılıyorsa `tools/check-architecture.sh` ve `tools/check-architecture.awk` içindeki katman listeleri de güncellenir.
+`business/` and `platform/` stay the same in all of these. If another name replaces `screens/`, also update the layer lists in `tools/check-architecture.sh` and `tools/check-architecture.awk`.
 
-## 15. Mevcut projeye geçiş
+## 15. Moving an existing project
 
-1. **Güvenceye al:** Kritik akışlara birkaç uçtan uca test yaz.
-2. **Eski ihlalleri kaydet:** `sh tools/check-architecture.sh --update-baseline` çalıştır. Bundan sonra yalnızca yeni ihlaller engellenir. Eski klasörlerdeki mevcut dosyalar düzenlenebilir, ama oraya yeni dosya eklenemez.
-3. **Sil:** Ölü kodu ve aracı sınıfları at.
-4. **Giriş noktalarını ayıkla:** Her birini gerçek, deneme veya ölü olarak ayır.
-5. **Kurulumu topla:** Statik erişimi constructor'a çevir, kurulumu `app/Wiring` içine al.
-6. **AppFrame'i parçala:** Sırayla ekran değiştirmeyi, mesajları ve ortak veriyi ayır. Geçişte eski metotlar yeni sınıflara yönlendirebilir.
-7. **Ekranları taşı:** En sık değişen ekrandan başla. Eski klasörler geçiş boyunca yeni yapıyla yan yana durabilir.
+1. **Protect it:** Write a few end-to-end tests for the critical flows.
+2. **Record old violations:** Run `sh tools/check-architecture.sh --update-baseline`. From then on, only new violations are blocked. Existing files in legacy folders can be edited, but new files cannot be added there.
+3. **Delete:** Remove dead code and pass-through classes.
+4. **Sort the entry points:** Mark each one as real, trial or dead.
+5. **Gather the setup:** Turn static access into constructor parameters and move setup into `app/Wiring`.
+6. **Split AppFrame:** Separate screen switching, messages and shared data, in that order. During the move, old methods can forward to the new classes.
+7. **Move the screens:** Start with the screen that changes most. Legacy folders can sit beside the new structure during the move.
 
-İki kural her adımda geçerlidir:
+Two rules apply at every step:
 
-- Yapı ve davranış değişikliği aynı commit'te olmaz.
-- Nadiren dokunulan ve çalışan modüller sırf bu yapıya uysun diye taşınmaz.
+- Structure and behavior changes do not go in the same commit.
+- Rarely touched, working modules are not moved just to fit this structure.
 
-## 16. Otomatik kontrol ve istisnalar
+## 16. Automatic check and exceptions
 
-`tools/check-architecture.sh` şunları denetler:
+`tools/check-architecture.sh` checks the following:
 
-| Kural kodu | Denetlenen |
+| Rule code | What it checks |
 |---|---|
-| `KLASOR` | Tanımsız üst klasör açılmış mı, eski klasörlere yeni dosya eklenmiş mi |
-| `BAGIMLILIK` | Import'lar Bölüm 3'teki yöne uyuyor mu |
-| `BOLUM_VERI` | Bölüm ve satırlar `Store` veya `Service` kullanıyor mu |
-| `STATIK_KABUK` | Kabuğa statik erişim var mı |
-| `DOSYA_ADI` | `Manager`, `Helper` veya `Util` adı kullanılmış mı |
+| `FOLDER` | Was an undefined top-level folder created, or a new file added to a legacy folder |
+| `DEPENDENCY` | Do imports follow the direction in Section 3 |
+| `SECTION_DATA` | Do sections and rows use `Store` or `Service` |
+| `STATIC_SHELL` | Is there static access to the shell |
+| `FILE_NAME` | Was the name `Manager`, `Helper` or `Util` used |
 
-Kontrol Java, Kotlin, Dart, JavaScript, TypeScript ve Python import'larını okur. Tam adla yapılan kullanımı ve iş konuları arasındaki bağımlılığı göremez, bunlar kod incelemesinde kontrol edilir. Diğer dillerde katman kuralları için dilin kendi aracı kullanılır.
+The check reads Java, Kotlin, Dart, JavaScript, TypeScript and Python imports. It cannot see usage by full name or dependencies between business topics, so code review covers these. For other languages, use the language's own tool for the layer rules.
 
-İstisna gerekiyorsa:
+If you need an exception:
 
-- Yapıyı değiştiren karar önce bu dosyada PR ile değişir, sonra kod yazılır.
-- `tools/architecture-baseline.txt` yalnızca insan kararıyla güncellenir ve kod sahibinin onayından geçer.
-- Bir kural değişirse `docs/ARCHITECTURE.md`, `AGENTS.md` ve kontrol betiği birlikte güncellenir.
+- A decision that changes the structure changes this file in a PR first, and then the code is written.
+- `tools/architecture-baseline.txt` is updated only by a person's decision and goes through code owner approval.
+- When a rule changes, `docs/ARCHITECTURE.md`, `AGENTS.md` and the check script are updated together.
 
-## 17. PR kontrol listesi
+## 17. PR checklist
 
-- [ ] Yeni kod Bölüm 1'deki yerinde mi?
-- [ ] Görünen ekran, bölüm ve satırdan koda hiyerarşi izlenerek ulaşılabiliyor mu?
-- [ ] Yeni sınıf veya interface Bölüm 11'deki koşulu sağlıyor mu?
-- [ ] Görevle ilgisi olmayan taşıma veya yeniden adlandırma yok mu?
-- [ ] Yapı ve davranış değişikliği ayrı commit'lerde mi?
-- [ ] Arayüz değişikliği varsa tasarım md dosyasına uyuyor mu?
-- [ ] Mimari kontrol ve testler geçiyor mu?
+- [ ] Is the new code in its place from Section 1?
+- [ ] Can the code be reached from the visible screen, section and row by following the hierarchy?
+- [ ] Does each new class or interface meet the condition in Section 11?
+- [ ] Are there no moves or renames unrelated to the task?
+- [ ] Are structure and behavior changes in separate commits?
+- [ ] If the interface changed, does it follow the design md file?
+- [ ] Do the architecture check and tests pass?

@@ -1,45 +1,45 @@
 ---
 name: install
-description: Proje Mimarisi kitini açık olan projeye kurar. Dosya yapısı rehberini, AI ajan kurallarını ve otomatik mimari kontrolü ekler.
-argument-hint: "[kaynak kökü, import öneki veya kod sahibi]"
+description: Installs the Project Architecture kit into the open project. Adds the file structure guide, AI agent rules and the automatic architecture check.
+argument-hint: "[source root, import prefix or code owner]"
 disable-model-invocation: true
 ---
 
-# Proje Mimarisi kitini kur
+# Install the Project Architecture kit
 
-Kullanıcının verdiği ek bilgi: $ARGUMENTS
+Extra information from the user: $ARGUMENTS
 
-Kit dosyaları şu klasördedir: `${CLAUDE_PLUGIN_ROOT}`
+The kit files are in this folder: `${CLAUDE_PLUGIN_ROOT}`
 
-## Adımlar
+## Steps
 
-1. `${CLAUDE_PLUGIN_ROOT}/README.md` dosyasını oku.
-2. Çalışma klasörünün Git deposu olduğunu doğrula. Değilse dur ve kullanıcıya `git init` çalıştırmak isteyip istemediğini sor.
-3. Projeye bakarak `install.sh` seçeneklerini belirle:
-   - `--src-root`: Katman klasörlerinin bulunduğu veya bulunacağı klasör.
-   - `--import-prefix`: Bu klasörün import'larda görünen adı. Java ve Kotlin'de zorunludur.
-   - `--extra-dirs`: Dilin veya çatının zorunlu kıldığı üst klasörler.
-   - `--owner`: GitHub kullanıcısı veya ekibi. Kesin bilmiyorsan kullanıcıya sor, tahmin etme.
-   - `--scaffold`: Yalnızca kaynak kökü henüz yoksa.
-4. Seçtiğin değerleri ve çalıştıracağın komutu göster. Kullanıcının onayını bekle.
-5. Onaydan sonra kiti kur:
+1. Read `${CLAUDE_PLUGIN_ROOT}/README.md`.
+2. Confirm that the working folder is a Git repository. If it is not, stop and ask the user whether to run `git init`.
+3. Look at the project and choose the `install.sh` options:
+   - `--src-root`: The folder that holds, or will hold, the layer folders.
+   - `--import-prefix`: That folder's name as it appears in imports. Required for Java and Kotlin.
+   - `--extra-dirs`: Top-level folders the language or framework requires.
+   - `--owner`: GitHub user or team. If you are not sure, ask the user. Do not guess.
+   - `--scaffold`: Only if the source root does not exist yet.
+4. Show the values you chose and the command you will run. Wait for the user's approval.
+5. After approval, install the kit:
 
    ```sh
-   sh "${CLAUDE_PLUGIN_ROOT}/install.sh" "<proje kökü>" --src-root <yol> [seçenekler]
+   sh "${CLAUDE_PLUGIN_ROOT}/install.sh" "<project root>" --src-root <path> [options]
    ```
 
-   Windows PowerShell `sh` komutunu tanımıyorsa `README.md` içindeki PowerShell komutunu kullan.
-6. Komutun çıktısındaki "Kalan adımlar" listesini kullanıcıya bildir. Derleme ve test komutları projede açıkça görünüyorsa `AGENTS.md` içine yaz, görünmüyorsa kullanıcıya sor.
+   If Windows PowerShell does not recognize `sh`, use the PowerShell command in `README.md`.
+6. Tell the user the "Remaining steps" list from the command's output. If the build and test commands are clear from the project, write them in `AGENTS.md`. If not, ask the user.
 
-## Yapma
+## Do not
 
-- Kullanıcıya sormadan commit oluşturma veya push etme.
-- Var olan kodu taşıma veya değiştirme.
-- `--update-baseline` komutunu çalıştırma. Kurulum betiği bunu ilk kurulumda kendisi yapar.
-- Var olan `AGENTS.md` veya `.claude/settings.json` dosyalarını kullanıcıya sormadan değiştirme.
+- Commit or push without asking the user.
+- Move or change existing code.
+- Run `--update-baseline`. The install script does this itself on first install.
+- Change an existing `AGENTS.md` or `.claude/settings.json` without asking the user.
 
-## Sonuç
+## Result
 
-Kullanıcıya şunları bildir: kullanılan değerler, eklenen dosyalar, kontrol sonucu ve kalan adımlar.
+Tell the user: the values used, the files added, the check result and the remaining steps.
 
-Plugin tek başına korumaz. Takımı ve diğer AI araçlarını bağlayan dosyaların commit'lenmesi ve GitHub kuralının açılması gerektiğini belirt.
+The plugin does not protect the project by itself. Point out that the files that bind the team and other AI tools must be committed and that the GitHub rule must be turned on.

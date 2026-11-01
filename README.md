@@ -1,30 +1,30 @@
 # AI Agent Skills
 
-AI ajanlarıyla çalışan projelere kurulabilen kitler.
+Installable kits for projects that work with AI agents.
 
-| Kit | Ne sağlar |
+| Kit | What it provides |
 |---|---|
-| [Proje Mimarisi](project-architecture/README.md) | Ekrandan koda izlenebilen dosya yapısı, AI ajanları için kurallar ve yapının dışına çıkılmasını engelleyen otomatik kontrol |
+| [Project Architecture](project-architecture/README.md) | A file structure you can trace from a screen to its code, rules for AI agents and an automatic check that keeps everyone inside the structure |
 
-## Hızlı başlangıç
+## Quick start
 
-Claude Code kullanıyorsan plugin olarak kur ve projende çalıştır:
+If you use Claude Code, install it as a plugin and run it in your project:
 
 ```text
 /plugin install project-architecture --marketplace Liosdali/AI_Agent_Skills
 /project-architecture:install
 ```
 
-Diğer araçlarla kurulum betiğini kullan:
+With other tools, use the install script:
 
 ```sh
 git clone https://github.com/Liosdali/AI_Agent_Skills.git
 cd AI_Agent_Skills/project-architecture
-sh install.sh /proje/yolu --src-root src
+sh install.sh /path/to/project --src-root src
 ```
 
-Proje türüne göre ayarlar, kalan adımlar ve sorun giderme için [kurulum rehberini](project-architecture/README.md) izle.
+See the [install guide](project-architecture/README.md) for settings by project type, the remaining steps and troubleshooting.
 
-## Lisans
+## License
 
 [MIT](LICENSE)

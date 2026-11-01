@@ -1,16 +1,16 @@
 # AGENTS.md
 
-Bu dosya projede çalışan tüm AI ajanları için bağlayıcıdır. Kuralların gerekçesi ve örnekleri `docs/ARCHITECTURE.md` içindedir. Kod yazmadan önce o dosyayı oku.
+This file is binding for all AI agents working in this project. The reasons and examples behind the rules are in `docs/ARCHITECTURE.md`. Read that file before writing code.
 
-## Bu proje
+## This project
 
-- Kaynak kökü: `src/`
-- Derleme: `<derleme komutu>`
-- Test: `<test komutu>`
-- Mimari kontrol: `sh tools/check-architecture.sh`
-- Windows PowerShell'de mimari kontrol: `& "$env:ProgramFiles\Git\bin\sh.exe" tools/check-architecture.sh`
+- Source root: `src/`
+- Build: `<build command>`
+- Test: `<test command>`
+- Architecture check: `sh tools/check-architecture.sh`
+- Architecture check in Windows PowerShell: `& "$env:ProgramFiles\Git\bin\sh.exe" tools/check-architecture.sh`
 
-## Temel kurallar
+## Core rules
 
 ### 1. Think Before Coding
 
@@ -43,46 +43,46 @@ Bu dosya projede çalışan tüm AI ajanları için bağlayıcıdır. Kuralları
 - For multi-step tasks, write the plan first. Attach a check to each step.
 - Loop until the goal is verified. Do not declare done until it is.
 
-## Kod yazmadan önce
+## Before writing code
 
-1. Değişikliğin yerini `docs/ARCHITECTURE.md` Bölüm 1'den belirle.
-2. Aynı klasördeki benzer dosyaları oku ve aynı kalıbı kullan.
-3. Görevin dosya yapısına uymadığını görürsen dur ve kullanıcıya sor.
+1. Find where the change belongs in `docs/ARCHITECTURE.md` Section 1.
+2. Read similar files in the same folder and use the same pattern.
+3. If the task does not fit the file structure, stop and ask the user.
 
-## Kesin kurallar
+## Strict rules
 
-1. **Yerleşim:** Kaynak kökünde yalnızca `app`, `shell`, `screens`, `business`, `jobs`, `shared` ve `platform` bulunur. Yeni üst seviye klasör açma.
-2. **Bağımlılık yönü:** `app → shell, screens, jobs → business → platform`. `shell` ile `screens` birbirini import etmez. Bu iki katman ve `jobs`, `platform` içinden yalnızca `logging` ve `config` kullanır.
-3. **İsimler:** Klasör ve dosya adları görünen ekran, bölüm ve satırla eşleşir. Aynı veri her katmanda aynı adı taşır.
-4. **Veri kapısı:** Bölüm ve satırlar `Store` veya `Service` kullanmaz, veriyi `XData` üzerinden alır.
-5. **İş kuralı:** Hesap ve karar kodu `business/` içine yazılır, ekrana yazılmaz.
-6. **Kabuk:** `AppFrame` veya eşdeğeri yalnızca pencereyi ve bölgeleri kurar. Statik erişim ve genel event bus kullanma.
-7. **Adlandırma:** `Manager`, `Helper` ve `Utils` adlı dosya veya sınıf oluşturma.
-8. **Soyutlama:** Interface, servis, mapper veya `shared/` kodunu yalnızca `docs/ARCHITECTURE.md` Bölüm 11'deki koşul sağlanıyorsa ekle.
-9. **Tasarım:** Projede tasarımı tanımlayan bir md dosyası varsa (ör. `DESIGN.md`), arayüz kodu yazmadan önce oku ve dışına çıkma. Dosyada olmayan renk, yazı tipi, ölçü, bileşen veya etkileşim ekleme. Görev dosyayla çelişiyorsa ya da dosya görevi kapsamıyorsa dur ve kullanıcıya sor. Dosyayı kullanıcı istemeden değiştirme.
+1. **Layout:** The source root contains only `app`, `shell`, `screens`, `business`, `jobs`, `shared` and `platform`. Do not create a new top-level folder.
+2. **Dependency direction:** `app → shell, screens, jobs → business → platform`. `shell` and `screens` do not import each other. These two layers and `jobs` use only `logging` and `config` from `platform`.
+3. **Names:** Folder and file names match the visible screen, section and row. The same data has the same name in every layer.
+4. **Data gate:** Sections and rows do not use `Store` or `Service`. They get data through `XData`.
+5. **Business rules:** Calculation and decision code goes in `business/`, not in screens.
+6. **Shell:** `AppFrame` or its equivalent only sets up the window and regions. Do not use static access or a general event bus.
+7. **Naming:** Do not create files or classes named `Manager`, `Helper` or `Utils`.
+8. **Abstraction:** Add an interface, service, mapper or `shared/` code only when the condition in `docs/ARCHITECTURE.md` Section 11 is met.
+9. **Design:** If the project has an md file that defines the design (for example `DESIGN.md`), read it before writing interface code and stay inside it. Do not add colors, fonts, sizes, components or interactions that are not in the file. If the task conflicts with the file or the file does not cover the task, stop and ask the user. Do not change the file unless the user asks.
 
-## Kullanıcıya sormadan yapma
+## Do not do these without asking the user
 
-- Yeni katman veya üst seviye klasör açma.
-- Yeni bağımlılık veya çatı ekleme.
-- Görev dışındaki kodu taşıma, yeniden adlandırma veya düzenleme.
-- Şu dosyaları değiştirme: `AGENTS.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md`, `.claude/settings.json`, `.githooks/`, `.github/CODEOWNERS`, `.github/workflows/architecture.yml`, `tools/check-architecture.*`, `tools/architecture-baseline.txt`.
-- `--update-baseline` veya `--no-verify` kullanma.
+- Create a new layer or top-level folder.
+- Add a new dependency or framework.
+- Move, rename or edit code outside the task.
+- Change these files: `AGENTS.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md`, `.claude/settings.json`, `.githooks/`, `.github/CODEOWNERS`, `.github/workflows/architecture.yml`, `tools/check-architecture.*`, `tools/architecture-baseline.txt`.
+- Use `--update-baseline` or `--no-verify`.
 
-## Eski kod
+## Legacy code
 
-Proje bu yapıya geçiş aşamasında olabilir.
+The project may be moving to this structure.
 
-- Yeni kodu yeni yapıya yaz. Eski klasörlerdeki mevcut dosyaları düzenleyebilirsin, ama oraya yeni dosya ekleme.
-- Görevin gerektirmediği eski kodu taşıma.
-- Taşıma görevi verildiyse davranışı değiştirme ve taşımayı ayrı commit'te yap.
+- Write new code in the new structure. You can edit existing files in legacy folders, but do not add new files there.
+- Do not move legacy code the task does not require.
+- If the task is a move, do not change behavior and make the move in its own commit.
 
-## Kontrol başarısız olursa
+## If the check fails
 
-Kodu kurala uyacak şekilde düzelt. Kontrolü, baseline'ı veya kuralı değiştirerek geçmeye çalışma. Kurala uymak mümkün değilse dur ve nedenini kullanıcıya bildir.
+Fix the code to follow the rule. Do not try to pass by changing the check, the baseline or the rule. If the rule cannot be followed, stop and tell the user why.
 
-## Bitirmeden önce
+## Before finishing
 
-1. `sh tools/check-architecture.sh` çalıştır.
-2. Projenin testlerini çalıştır.
-3. Kullanıcıya şunları bildir: eklenen dosyalar, kontrol sonucu, test sonucu ve varsa yapıya uymayan nokta.
+1. Run `sh tools/check-architecture.sh`.
+2. Run the project's tests.
+3. Tell the user: the files added, the check result, the test result and anything that does not fit the structure.

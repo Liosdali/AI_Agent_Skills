@@ -26,7 +26,7 @@
             "shell": "bash",
             "command": "sh \"$CLAUDE_PROJECT_DIR/tools/check-architecture.sh\" --hook",
             "timeout": 60,
-            "statusMessage": "Mimari kontrol"
+            "statusMessage": "Architecture check"
           }
         ]
       }

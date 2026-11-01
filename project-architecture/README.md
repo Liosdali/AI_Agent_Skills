@@ -1,221 +1,223 @@
-# Proje Mimarisi Kiti
+# Project Architecture Kit
 
-Bu kit bir projeye ortak bir mimari kurar ve hem takımın hem AI ajanlarının bu yapının dışına çıkmasını engeller.
+This kit installs a shared architecture into a project and keeps both the team and AI agents from leaving that structure.
 
-İki amacı var:
+It has two goals:
 
-- **Bulunabilirlik:** Projeye yeni gelen biri, ekranda gördüğü bir satırın kodunu klasörleri izleyerek bulabilir.
-- **İzlenebilirlik:** Bağımlılıklar tepeden aşağı tek yönde okunur.
+- **Findability:** Someone new to the project can find the code behind a line on a screen by following folders.
+- **Traceability:** Dependencies read top-down in one direction.
 
-Yapının tamamı [template/docs/ARCHITECTURE.md](template/docs/ARCHITECTURE.md) dosyasındadır.
+The full structure is in [template/docs/ARCHITECTURE.md](template/docs/ARCHITECTURE.md).
 
-## Nasıl korur
+## How it protects the structure
 
-| Koruma | Dosya | Etkisi |
+| Protection | File | Effect |
 |---|---|---|
-| Kural | `docs/ARCHITECTURE.md`, `AGENTS.md`, `CLAUDE.md` | Takım ve AI yapıyı buradan öğrenir. Uyulması garanti değildir. |
-| Anlık uyarı | `.claude/settings.json` | Claude Code her düzenlemeden sonra kontrolü çalıştırır ve ihlali ajana bildirir. Dosyayı geri almaz. Mimari dosyalarını düzenlemeyi de yasaklar. |
-| Commit engeli | `.githooks/pre-commit` | Hangi araç kullanılırsa kullanılsın yeni ihlal commit'lenemez. `--no-verify` ile atlanabilir. |
-| Birleştirme engeli | `.github/workflows/architecture.yml`, `.github/CODEOWNERS` | Kanca atlansa bile ihlalli PR birleştirilemez. Mimari dosyalarındaki değişiklikler kod sahibinin onayını ister. |
+| Rules | `docs/ARCHITECTURE.md`, `AGENTS.md`, `CLAUDE.md` | The team and AI learn the structure here. Following them is not guaranteed. |
+| Immediate warning | `.claude/settings.json` | Claude Code runs the check after every edit and reports violations to the agent. It does not undo the file. It also blocks edits to the architecture files. |
+| Commit block | `.githooks/pre-commit` | New violations cannot be committed, whichever tool is used. It can be skipped with `--no-verify`. |
+| Merge block | `.github/workflows/architecture.yml`, `.github/CODEOWNERS` | Even if the hook is skipped, a PR with violations cannot be merged. Changes to the architecture files need code owner approval. |
 
-Kontrol kuralları `tools/check-architecture.sh` içindedir. Mevcut projelerde eski ihlaller kaydedilir, yalnızca yeni ihlaller engellenir. Eski klasörlerdeki dosyalar düzenlenebilir, ama oraya yeni dosya eklenemez.
+The check's rules are in `tools/check-architecture.sh`. In existing projects, old violations are recorded and only new ones are blocked. Files in legacy folders can be edited, but new files cannot be added there.
 
-## Gereksinimler
+## Requirements
 
-- **Git:** Windows'ta [Git for Windows](https://git-scm.com/download/win), Git Bash ile birlikte gelir.
-- **Git deposu:** Kitin kurulacağı proje bir Git deposu olmalıdır.
-- **GitHub:** Yalnızca birleştirme engeli için gerekir. Ana dal kuralı GitHub Free'de özel depolarda bulunmaz.
-- **Dil:** Import kontrolleri Java, Kotlin, Dart, JavaScript, TypeScript ve Python için çalışır.
+- **Git:** On Windows, [Git for Windows](https://git-scm.com/download/win), which includes Git Bash.
+- **Git repository:** The project that gets the kit must be a Git repository.
+- **GitHub:** Only needed for the merge block. The main branch rule is not available for private repositories on GitHub Free.
+- **Language:** Import checks work for Java, Kotlin, Dart, JavaScript, TypeScript and Python.
 
-## Kurulum yolu seç
+## Choose an install path
 
-İki yol da projeye aynı dosyaları kurar.
+Both paths install the same files into the project.
 
-| Yol | Kim için |
+| Path | For |
 |---|---|
-| [Claude Code plugin](#claude-code-plugin-ile-kurulum) | Claude Code kullananlar |
-| [Kurulum betiği](#kurulum-betiği-ile-kurulum) | Diğer araçları kullananlar ve kurulumu elle yapmak isteyenler |
+| [Claude Code plugin](#install-as-a-claude-code-plugin) | Claude Code users |
+| [Install script](#install-with-the-script) | Users of other tools and anyone who prefers to install by hand |
 
-Plugin, kitin yerini almaz. Yalnızca onu kuran kişinin Claude Code'unda çalışır. Takımı ve diğer AI araçlarını bağlayan dosyalar yine projeye commit'lenir.
+The plugin does not replace the kit. It only works in the Claude Code of the person who installed it. The files that bind the team and other AI tools are still committed to the project.
 
-## Claude Code plugin ile kurulum
+## Install as a Claude Code plugin
 
-Claude Code 2.1.275 veya sonrası gerekir. Plugin'i kur:
+Requires Claude Code 2.1.275 or later. Install the plugin:
 
 ```text
 /plugin install project-architecture --marketplace Liosdali/AI_Agent_Skills
 ```
 
-Daha eski sürümlerde:
+On older versions:
 
 ```text
 /plugin marketplace add Liosdali/AI_Agent_Skills
 /plugin install project-architecture@ai-agent-skills
 ```
 
-Claude Code'u kitin kurulacağı projede aç ve kurulumu başlat:
+Open Claude Code in the project that gets the kit and start the install:
 
 ```text
 /project-architecture:install
 ```
 
-Claude projeye bakarak ayarları belirler, seçtiği komutu gösterir ve onayını ister. Commit oluşturmaz ve push yapmaz. Kurulum bitince aşağıdaki [4. adımdan](#4-var-olan-dosyaları-kontrol-et) devam et.
+Claude works out the settings from the project, shows the command it chose and asks for your approval. It does not commit or push. When the install finishes, continue from [step 4](#4-check-existing-files) below.
 
-## Kurulum betiği ile kurulum
+## Install with the script
 
-### 1. Kiti indir
+### 1. Download the kit
 
 ```sh
 git clone https://github.com/Liosdali/AI_Agent_Skills.git
 cd AI_Agent_Skills/project-architecture
 ```
 
-### 2. Ayarları belirle
+### 2. Choose the settings
 
-`--src-root`, katman klasörlerinin (`app`, `screens`, `business` ...) bulunduğu veya bulunacağı klasördür. `--import-prefix`, bu klasörün import'larda görünen adıdır.
+`--src-root` is the folder that holds, or will hold, the layer folders (`app`, `screens`, `business` ...). `--import-prefix` is that folder's name as it appears in imports.
 
-| Proje | `--src-root` | `--import-prefix` |
+| Project | `--src-root` | `--import-prefix` |
 |---|---|---|
-| Java | `src/main/java/com/acme/app` | `com.acme.app` (zorunlu) |
-| Kotlin | `src/main/kotlin/com/acme/app` | `com.acme.app` (zorunlu) |
-| Flutter | `lib` | `package:uygulama_adi` |
-| TypeScript, JavaScript | `src` | Alias varsa `@`, yoksa boş |
-| Python | `src/uygulama_adi` | `uygulama_adi` |
+| Java | `src/main/java/com/acme/app` | `com.acme.app` (required) |
+| Kotlin | `src/main/kotlin/com/acme/app` | `com.acme.app` (required) |
+| Flutter | `lib` | `package:app_name` |
+| TypeScript, JavaScript | `src` | `@` if you use an alias, otherwise empty |
+| Python | `src/app_name` | `app_name` |
 
-Önek boş bırakılırsa yalnızca göreli import'lar denetlenir. Java ve Kotlin'de import'ların tamamı tam ad kullandığı için önek zorunludur.
+If the prefix is empty, only relative imports are checked. The prefix is required for Java and Kotlin because all their imports use full names.
 
-### 3. Kur
+### 3. Install
 
-Mevcut bir proje:
-
-```sh
-sh install.sh /proje/yolu --src-root src/main/java/com/acme/app --import-prefix com.acme.app --owner @kullanici
-```
-
-Yeni ve boş bir proje:
+An existing project:
 
 ```sh
-git init /proje/yolu
-sh install.sh /proje/yolu --src-root src --scaffold --owner @kullanici
+sh install.sh /path/to/project --src-root src/main/java/com/acme/app --import-prefix com.acme.app --owner @username
 ```
 
-Windows PowerShell `sh` komutunu tanımıyorsa Git Bash aç veya Git'in kabuğunu doğrudan çağır:
+A new, empty project:
+
+```sh
+git init /path/to/project
+sh install.sh /path/to/project --src-root src --scaffold --owner @username
+```
+
+If Windows PowerShell does not recognize `sh`, open Git Bash or call Git's shell directly:
 
 ```powershell
-& "$env:ProgramFiles\Git\bin\sh.exe" install.sh "C:\proje\yolu" --src-root src --owner "@kullanici"
+& "$env:ProgramFiles\Git\bin\sh.exe" install.sh "C:\path\to\project" --src-root src --owner "@username"
 ```
 
-Tüm seçenekler `sh install.sh --help` ile görülür.
+`sh install.sh --help` lists all the options.
 
-Betik şunları yapar:
+The script does the following:
 
-- `template/` içindeki dosyaları proje köküne kopyalar.
-- Ayarları `tools/check-architecture.sh`, `AGENTS.md` ve `.github/CODEOWNERS` dosyalarına yazar.
-- Eski ihlalleri `tools/architecture-baseline.txt` dosyasına kaydeder.
-- `core.hooksPath` değerini `.githooks` yapar.
-- `.githooks/pre-commit` dosyasını çalıştırılabilir olarak Git'e ekler.
+- Copies the files in `template/` to the project root.
+- Writes the settings to `tools/check-architecture.sh`, `AGENTS.md` and `.github/CODEOWNERS`.
+- Records old violations in `tools/architecture-baseline.txt`.
+- Sets `core.hooksPath` to `.githooks`.
+- Adds `.githooks/pre-commit` to Git as executable.
 
-Commit oluşturmaz, push yapmaz ve kodu taşımaz.
+It does not commit, push or move code.
 
-### 4. Var olan dosyaları kontrol et
+### 4. Check existing files
 
-Betik hiçbir dosyanın üzerine yazmaz. Sonuç ekranındaki "Kalan adımlar" bölümü elle yapılacakları listeler.
+The script never overwrites a file. The "Remaining steps" section of its output lists what to do by hand.
 
-| Var olan dosya | Betiğin yaptığı | Senin yapacağın |
+| Existing file | What the script does | What you do |
 |---|---|---|
-| `CLAUDE.md` | `@AGENTS.md` satırını ekler | Bir şey gerekmez |
-| `.gitattributes` | Eksik satırları ekler | Bir şey gerekmez |
-| `AGENTS.md` | Dokunmaz | `template/AGENTS.md` içindeki kuralları ekle |
-| `.claude/settings.json` | Dokunmaz | `template/.claude/settings.json` içindeki `hooks` ve `permissions` bölümlerini ekle |
-| `core.hooksPath` veya `pre-commit` kancası | Dokunmaz | Var olan kancaya `sh tools/check-architecture.sh` satırını ekle |
-| Diğerleri | Dokunmaz | İçeriği kendin birleştir |
+| `CLAUDE.md` | Adds the `@AGENTS.md` line | Nothing |
+| `.gitattributes` | Adds the missing lines | Nothing |
+| `AGENTS.md` | Leaves it alone | Add the rules from `template/AGENTS.md` |
+| `.claude/settings.json` | Leaves it alone | Add the `hooks` and `permissions` sections from `template/.claude/settings.json` |
+| `core.hooksPath` or a `pre-commit` hook | Leaves it alone | Add the line `sh tools/check-architecture.sh` to the existing hook |
+| Others | Leaves them alone | Merge the content yourself |
 
-### 5. Kalan adımları tamamla
+### 5. Finish the remaining steps
 
-1. **Komutları yaz:** `AGENTS.md` içindeki derleme ve test komutlarını doldur.
-2. **Commit'le:** Eklenen dosyaları gözden geçir, commit'le ve push et.
-3. **GitHub'da zorunlu kıl:** Workflow bir kez çalıştıktan sonra depo ayarlarında ana dal için bir kural oluştur. `architecture` kontrolünü ve kod sahibi onayını zorunlu yap.
+1. **Fill in the commands:** Add the build and test commands to `AGENTS.md`.
+2. **Commit:** Review the added files, commit and push.
+3. **Enforce it on GitHub:** After the workflow has run once, create a rule for the main branch in the repository settings. Require the `architecture` check and code owner approval.
 
-Son adım atlanırsa kancalar yine çalışır, ama `--no-verify` ile atlanabilir.
+If you skip the last step the hooks still run, but they can be skipped with `--no-verify`.
 
-### 6. Doğrula
+### 6. Verify
 
-`business/` altındaki bir dosyaya `screens/` import'u ekle ve kontrolü çalıştır:
+Add an import of `screens/` to a file under `business/` and run the check:
 
 ```sh
 sh tools/check-architecture.sh
 ```
 
-Çıktıda `[BAGIMLILIK]` görmelisin. Claude Code kullanıyorsan aynı değişikliği ona yaptır ve kontrol mesajını aldığını doğrula. Proje ayarlarının uygulanması için klasöre güven onayı gerekir, kancaları `/hooks` ile görebilirsin. Sonra değişikliği geri al.
+You should see `[DEPENDENCY]` in the output. If you use Claude Code, have it make the same change and confirm that it receives the check message. Project settings only apply after you trust the folder, and `/hooks` shows the hooks. Then undo the change.
 
-## Takım arkadaşları
+## Teammates
 
-Kitin kurulu olduğu bir projeyi klonlayan herkes kendi kopyasında bir kez çalıştırır:
+Everyone who clones a project with the kit installed runs this once in their copy:
 
 ```sh
 git config core.hooksPath .githooks
 ```
 
-## Diğer AI ajanlarına kurdurma
+## Having other AI agents install it
 
-Claude Code dışındaki bir ajanı proje klasöründe başlat ve şunu yapıştır:
+Start an agent other than Claude Code in the project folder and paste this:
 
 ```text
-https://github.com/Liosdali/AI_Agent_Skills deposunu geçici bir klasöre klonla ve
-project-architecture/README.md dosyasını oku. Bu proje için --src-root ve
---import-prefix değerlerini belirle, seçtiğin değerleri bana göster ve onayımı al.
-Sonra install.sh ile kiti kur. "Kalan adımlar" listesini uygula, ama commit ve push
-yapmadan önce bana sor. Var olan kodu taşıma ve değiştirme.
+Clone https://github.com/Liosdali/AI_Agent_Skills to a temporary folder and read
+project-architecture/README.md. Work out the --src-root and --import-prefix values
+for this project, show me the values you chose and get my approval. Then install the
+kit with install.sh. Follow the "Remaining steps" list, but ask me before you commit
+or push. Do not move or change existing code.
 ```
 
-`AGENTS.md` okumayan bir araç kullanılıyorsa o aracın talimat dosyasına `AGENTS.md` dosyasını okumasını söyleyen bir satır ekle.
+If a tool does not read `AGENTS.md`, add a line to that tool's instruction file telling it to read `AGENTS.md`.
 
-## Sorun giderme
+## Troubleshooting
 
-| Belirti | Neden ve çözüm |
+| Symptom | Cause and fix |
 |---|---|
-| `sh` tanınmıyor | PowerShell'desin. Git Bash aç veya yukarıdaki PowerShell komutunu kullan. |
-| `... bir Git deposu değil` | Proje klasöründe `git init` çalıştır. |
-| `Kaynak kökü bulunamadı` | `--src-root` değerini kontrol et. Yeni projede `--scaffold` ekle. |
-| `--import-prefix zorunludur` | Java veya Kotlin için paket adını ver. |
-| Kontrol ihlal bulmuyor | `--import-prefix` import'larla eşleşmiyor olabilir. Değeri `tools/check-architecture.sh` içinde düzelt. |
-| Commit engelleniyor | Çıktıdaki ihlali düzelt. Üretilmiş bir klasörse `EXTRA_DIRS` değerine ekle. |
-| Kural gerçekten değişti | Kod sahibi `sh tools/check-architecture.sh --update-baseline` çalıştırır ve sonucu PR ile önerir. |
-| Claude Code korunan dosyayı düzenleyemiyor | Bu beklenen davranıştır. Değişikliği elle yap veya `.claude/settings.json` içindeki ilgili `deny` satırını geçici olarak kaldır. |
+| `sh` is not recognized | You are in PowerShell. Open Git Bash or use the PowerShell command above. |
+| `... is not a Git repository` | Run `git init` in the project folder. |
+| `Source root not found` | Check the `--src-root` value. In a new project, add `--scaffold`. |
+| `--import-prefix is required` | Give the package name for Java or Kotlin. |
+| The check finds no violations | `--import-prefix` may not match your imports. Fix the value in `tools/check-architecture.sh`. |
+| A commit is blocked | Fix the violation in the output. If it is a generated folder, add it to `EXTRA_DIRS`. |
+| A rule really did change | The code owner runs `sh tools/check-architecture.sh --update-baseline` and proposes the result in a PR. |
+| Claude Code cannot edit a protected file | This is expected. Make the change by hand or temporarily remove the matching `deny` line from `.claude/settings.json`. |
 
-## Otomatik kontrolün sınırları
+## Limits of the automatic check
 
-- **Denetlenenler:** Klasör yerleşimi, bağımlılık yönü, satırların `Store` veya `Service` kullanımı, kabuğa statik erişim ve `Manager`, `Helper`, `Utils` dosya adları.
-- **Denetlenemeyenler:** İsimlerin ekranla eşleşmesi, ekrana yazılmış iş kuralları, gereksiz soyutlamalar ve arayüzün tasarım dosyasına uyumu. Bunlar için `docs/ARCHITECTURE.md` Bölüm 17'deki PR listesi kullanılır.
+- **Checked:** Folder layout, dependency direction, rows using `Store` or `Service`, static access to the shell and `Manager`, `Helper`, `Utils` file names.
+- **Not checked:** Names matching the screen, business rules written in screens, unnecessary abstractions and whether the interface follows the design file. The PR list in `docs/ARCHITECTURE.md` Section 17 covers these.
 
-## Kiti güncelleme
+## Updating the kit
 
-Betik var olan dosyalara dokunmadığı için yeniden çalıştırmak projeyi güncellemez. Yeni sürümü almak için `git pull` çalıştır veya plugin'i güncelle. Sonra değişen `template/` dosyalarını projeye elle kopyala. `tools/check-architecture.sh` içindeki ayar değerlerini ve `tools/architecture-baseline.txt` dosyasını koru.
+The script leaves existing files alone, so running it again does not update a project. To get a new version, run `git pull` or update the plugin. Then copy the changed `template/` files into the project by hand. Keep the settings in `tools/check-architecture.sh` and the `tools/architecture-baseline.txt` file.
 
-Plugin'i güncellemek için:
+Version 2 renames the rule codes in the baseline. A project that installed version 1 runs `sh tools/check-architecture.sh --update-baseline` once after copying the new check.
+
+To update the plugin:
 
 ```text
 /plugin marketplace update ai-agent-skills
 /plugin update project-architecture@ai-agent-skills
 ```
 
-## Kit üzerinde çalışma
+## Working on the kit
 
 ```text
 project-architecture/
-├─ .claude-plugin/  # Plugin tanımı
-├─ README.md        # Bu rehber
-├─ install.sh       # Kurulum betiği
-├─ skills/          # Plugin'in kurulum komutu
-├─ template/        # Projeye kopyalanan dosyalar
-└─ tests/           # Kit testleri
+├─ .claude-plugin/  # Plugin definition
+├─ README.md        # This guide
+├─ install.sh       # Install script
+├─ skills/          # The plugin's install command
+├─ template/        # Files copied into the project
+└─ tests/           # Kit tests
 ```
 
-Testler Ubuntu, macOS ve Windows üzerinde CI'da çalışır. Yerelde çalıştırmak için:
+Tests run in CI on Ubuntu, macOS and Windows. To run them locally:
 
 ```sh
 bash tests/test-kit.sh
 claude plugin validate .
 ```
 
-Kit her değiştiğinde `.claude-plugin/plugin.json` içindeki `version` değerini artır. Artırılmazsa kullanıcılara güncelleme gitmeyebilir.
+Increase `version` in `.claude-plugin/plugin.json` whenever the kit changes. Otherwise users may not receive the update.
