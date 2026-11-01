@@ -15,3 +15,7 @@ sh install.sh /proje/yolu --src-root src
 ```
 
 Proje türüne göre ayarlar, kalan adımlar ve sorun giderme için [kurulum rehberini](project-architecture/README.md) izle.
+
+## Lisans
+
+[MIT](LICENSE)
