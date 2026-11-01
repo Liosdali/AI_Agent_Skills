@@ -27,7 +27,41 @@ Kontrol kuralları `tools/check-architecture.sh` içindedir. Mevcut projelerde e
 - **GitHub:** Yalnızca birleştirme engeli için gerekir. Ana dal kuralı GitHub Free'de özel depolarda bulunmaz.
 - **Dil:** Import kontrolleri Java, Kotlin, Dart, JavaScript, TypeScript ve Python için çalışır.
 
-## Kurulum
+## Kurulum yolu seç
+
+İki yol da projeye aynı dosyaları kurar.
+
+| Yol | Kim için |
+|---|---|
+| [Claude Code plugin](#claude-code-plugin-ile-kurulum) | Claude Code kullananlar |
+| [Kurulum betiği](#kurulum-betiği-ile-kurulum) | Diğer araçları kullananlar ve kurulumu elle yapmak isteyenler |
+
+Plugin, kitin yerini almaz. Yalnızca onu kuran kişinin Claude Code'unda çalışır. Takımı ve diğer AI araçlarını bağlayan dosyalar yine projeye commit'lenir.
+
+## Claude Code plugin ile kurulum
+
+Claude Code 2.1.275 veya sonrası gerekir. Plugin'i kur:
+
+```text
+/plugin install project-architecture --marketplace Liosdali/AI_Agent_Skills
+```
+
+Daha eski sürümlerde:
+
+```text
+/plugin marketplace add Liosdali/AI_Agent_Skills
+/plugin install project-architecture@ai-agent-skills
+```
+
+Claude Code'u kitin kurulacağı projede aç ve kurulumu başlat:
+
+```text
+/project-architecture:install
+```
+
+Claude projeye bakarak ayarları belirler, seçtiği komutu gösterir ve onayını ister. Commit oluşturmaz ve push yapmaz. Kurulum bitince aşağıdaki [4. adımdan](#4-var-olan-dosyaları-kontrol-et) devam et.
+
+## Kurulum betiği ile kurulum
 
 ### 1. Kiti indir
 
@@ -122,9 +156,9 @@ Kitin kurulu olduğu bir projeyi klonlayan herkes kendi kopyasında bir kez çal
 git config core.hooksPath .githooks
 ```
 
-## AI ajanına kurdurma
+## Diğer AI ajanlarına kurdurma
 
-Ajanı proje klasöründe başlat ve şunu yapıştır:
+Claude Code dışındaki bir ajanı proje klasöründe başlat ve şunu yapıştır:
 
 ```text
 https://github.com/Liosdali/AI_Agent_Skills deposunu geçici bir klasöre klonla ve
@@ -156,14 +190,23 @@ yapmadan önce bana sor. Var olan kodu taşıma ve değiştirme.
 
 ## Kiti güncelleme
 
-Betik var olan dosyalara dokunmadığı için yeniden çalıştırmak güncelleme yapmaz. Yeni sürümü almak için `git pull` çalıştır ve değişen `template/` dosyalarını projeye elle kopyala. `tools/check-architecture.sh` içindeki ayar değerlerini ve `tools/architecture-baseline.txt` dosyasını koru.
+Betik var olan dosyalara dokunmadığı için yeniden çalıştırmak projeyi güncellemez. Yeni sürümü almak için `git pull` çalıştır veya plugin'i güncelle. Sonra değişen `template/` dosyalarını projeye elle kopyala. `tools/check-architecture.sh` içindeki ayar değerlerini ve `tools/architecture-baseline.txt` dosyasını koru.
+
+Plugin'i güncellemek için:
+
+```text
+/plugin marketplace update ai-agent-skills
+/plugin update project-architecture@ai-agent-skills
+```
 
 ## Kit üzerinde çalışma
 
 ```text
 project-architecture/
+├─ .claude-plugin/  # Plugin tanımı
 ├─ README.md        # Bu rehber
 ├─ install.sh       # Kurulum betiği
+├─ skills/          # Plugin'in kurulum komutu
 ├─ template/        # Projeye kopyalanan dosyalar
 └─ tests/           # Kit testleri
 ```
@@ -172,4 +215,7 @@ Testler Ubuntu, macOS ve Windows üzerinde CI'da çalışır. Yerelde çalışt�
 
 ```sh
 bash tests/test-kit.sh
+claude plugin validate .
 ```
+
+Kit her değiştiğinde `.claude-plugin/plugin.json` içindeki `version` değerini artır. Artırılmazsa kullanıcılara güncelleme gitmeyebilir.

@@ -3,11 +3,13 @@ name: Test project-architecture
 on:
   push:
     paths:
+      - ".claude-plugin/**"
       - "project-architecture/**"
       - ".github/workflows/test-project-architecture.yml"
       - ".gitattributes"
   pull_request:
     paths:
+      - ".claude-plugin/**"
       - "project-architecture/**"
       - ".github/workflows/test-project-architecture.yml"
       - ".gitattributes"

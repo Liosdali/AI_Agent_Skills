@@ -414,6 +414,35 @@ else
   echo "atlandı - jq veya node yok"
 fi
 
+echo "=== Plugin ==="
+REPO=$(cd "$KIT/.." && pwd)
+SKILL="$KIT/skills/install/SKILL.md"
+if [ -f "$SKILL" ]; then ok "kurulum komutu var"; else bad "kurulum komutu var"; fi
+if grep -q '^disable-model-invocation: true' "$SKILL"; then ok "kurulum yalnızca kullanıcı isteğiyle başlıyor"; else bad "kurulum yalnızca kullanıcı isteğiyle başlıyor"; fi
+if grep -q 'CLAUDE_PLUGIN_ROOT}/install.sh' "$SKILL"; then ok "komut kurulum betiğini gösteriyor"; else bad "komut kurulum betiğini gösteriyor"; fi
+PLUGIN_CHECK='const fs=require("fs");
+const m=JSON.parse(fs.readFileSync(".claude-plugin/marketplace.json","utf8"));
+const e=m.plugins.find(p=>p.name==="project-architecture");
+if(!e)throw new Error("marketplace kaydı yok");
+const p=JSON.parse(fs.readFileSync(e.source+"/.claude-plugin/plugin.json","utf8"));
+if(p.name!==e.name)throw new Error("ad uyuşmuyor");
+if(!/^\d+\.\d+\.\d+$/.test(p.version))throw new Error("sürüm geçersiz");'
+if command -v node > /dev/null 2>&1; then
+  if ERR=$(cd "$REPO" && node -e "$PLUGIN_CHECK" 2>&1); then ok "marketplace ve plugin tanımı tutarlı"; else bad "marketplace ve plugin tanımı tutarlı" "$ERR"; fi
+else
+  echo "atlandı - node yok"
+fi
+cp -r "$KIT" "$WORK/plugin kopya"
+new_repo "plugin-hedef"
+install_from_copy() { OUT=$(sh "$WORK/plugin kopya/install.sh" "$@" 2>&1); CODE=$?; }
+install_from_copy "$P" --src-root src --scaffold
+expect_code 0 "kit başka klasöre kopyalanınca da kuruluyor"
+expect_file ".githooks/pre-commit" "kopyadan kanca kuruldu"
+expect_file ".github/workflows/architecture.yml" "kopyadan iş akışı kuruldu"
+expect_file ".claude/settings.json" "kopyadan Claude ayarı kuruldu"
+expect_none "skills" "plugin komutu projeye kopyalanmadı"
+expect_none ".claude-plugin" "plugin tanımı projeye kopyalanmadı"
+
 echo "=== Performans ==="
 export ARCH_SRC_ROOT="src" ARCH_IMPORT_PREFIX=""
 new_project "buyuk"
