@@ -1,6 +1,6 @@
 {
   "name": "project-architecture",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Dosya yapısı rehberini, AI ajan kurallarını ve otomatik mimari kontrolü bir projeye kurar",
   "author": {
     "name": "Mete Baykal"

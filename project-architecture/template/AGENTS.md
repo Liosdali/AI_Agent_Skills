@@ -59,6 +59,7 @@ Bu dosya projede çalışan tüm AI ajanları için bağlayıcıdır. Kuralları
 6. **Kabuk:** `AppFrame` veya eşdeğeri yalnızca pencereyi ve bölgeleri kurar. Statik erişim ve genel event bus kullanma.
 7. **Adlandırma:** `Manager`, `Helper` ve `Utils` adlı dosya veya sınıf oluşturma.
 8. **Soyutlama:** Interface, servis, mapper veya `shared/` kodunu yalnızca `docs/ARCHITECTURE.md` Bölüm 11'deki koşul sağlanıyorsa ekle.
+9. **Tasarım:** Projede tasarımı tanımlayan bir md dosyası varsa (ör. `DESIGN.md`), arayüz kodu yazmadan önce oku ve dışına çıkma. Dosyada olmayan renk, yazı tipi, ölçü, bileşen veya etkileşim ekleme. Görev dosyayla çelişiyorsa ya da dosya görevi kapsamıyorsa dur ve kullanıcıya sor. Dosyayı kullanıcı istemeden değiştirme.
 
 ## Kullanıcıya sormadan yapma
 

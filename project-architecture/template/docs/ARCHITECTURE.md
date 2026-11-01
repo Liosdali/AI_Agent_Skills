@@ -141,6 +141,7 @@ Bağımlılıklar constructor'dan verilir ve `app/Wiring` içinde kurulur. Böyl
 3. **İş kuralı ekranda yazılmaz:** Hesap ve kararlar `business/` içinde durur.
 4. **Bağımlılık aşağı iner:** Bölüm 3'teki yön dışına çıkılmaz, döngü oluşturulmaz.
 5. **Gizli erişim yoktur:** `AppFrame.getInstance()` gibi statik erişim ve genel event bus kullanılmaz.
+6. **Tasarım dosyasının dışına çıkılmaz:** Projede tasarımı tanımlayan bir md dosyası varsa (ör. `DESIGN.md`), arayüz bu dosyaya uyar. Dosyada olmayan bir şey gerekiyorsa önce dosya insan kararıyla güncellenir.
 
 ## 5. Ekrandaki veriyi bulma
 
@@ -352,4 +353,5 @@ Kontrol Java, Kotlin, Dart, JavaScript, TypeScript ve Python import'larını oku
 - [ ] Yeni sınıf veya interface Bölüm 11'deki koşulu sağlıyor mu?
 - [ ] Görevle ilgisi olmayan taşıma veya yeniden adlandırma yok mu?
 - [ ] Yapı ve davranış değişikliği ayrı commit'lerde mi?
+- [ ] Arayüz değişikliği varsa tasarım md dosyasına uyuyor mu?
 - [ ] Mimari kontrol ve testler geçiyor mu?
